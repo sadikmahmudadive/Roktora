@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/permissions/permissions.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
@@ -202,7 +203,11 @@ class _EligibilityScreenState extends ConsumerState<EligibilityScreen> {
     if (_step < 4) return setState(() => _step++);
     final p = ref.read(profileProvider).value;
     if (p != null) await ref.read(repositoryProvider).saveProfile(p.copyWith(eligible: !_deferred));
-    if (mounted) context.go('/home');
+    if (!mounted) return;
+    // Ask for location + notifications once, right after onboarding; later retakes go straight home.
+    final perms = ref.read(permissionsProvider).value;
+    final skip = (perms?.allGranted ?? false) || await primerSeen();
+    if (mounted) context.go(skip ? '/home' : '/permissions');
   }
 
   @override

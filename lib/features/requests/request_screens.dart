@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../core/permissions/permissions.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/motion.dart';
@@ -370,11 +371,14 @@ class _PostRequestScreenState extends ConsumerState<PostRequestScreen> {
   Future<void> _post() async {
     final repo = ref.read(repositoryProvider);
     final name = ref.read(profileProvider).value?.publicName ?? '';
+    final here = ref.read(userLocationProvider).value;
+    double? near(double? v) => v == null ? null : (v * 1000).round() / 1000; // ~110 m
     setState(() => _busy = true);
     final hours = switch (_urgency) { Urgency.critical => 6, Urgency.urgent => 24, Urgency.routine => 72 };
     await repo.postRequest(BloodRequest(
       id: '', bloodGroup: _group, title: _title.text.trim(), place: _place.text.trim(), distanceKm: 0, bagsNeeded: _bags, committed: 0,
       urgency: _urgency, deadline: DateTime.now().add(Duration(hours: hours)), postedBy: name,
+      lat: near(here?.lat), lng: near(here?.lng),
     ));
     if (mounted) {
       context.pop();

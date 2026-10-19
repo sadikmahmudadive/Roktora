@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
+import '../permissions/permissions_screen.dart' show PermissionReminder;
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/motion.dart';
 import '../../core/widgets/widgets.dart';
@@ -230,6 +231,7 @@ class HomeScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 16),
               child: InfoBanner("You're offline or can't reach the server. Pull down to retry.", icon: TablerIcons.cloud_off, bg: c.surface2, fg: c.textSecondary),
             ),
+          const PermissionReminder(),
           if (profile != null) FadeSlideIn(child: _DonorTile(profile)),
           const SizedBox(height: 16),
           Padding(

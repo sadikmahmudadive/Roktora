@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Approximate location is enough for matching donors; fine location improves the map. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Runtime permission on Android 13+ for push alerts. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="Roktora"
         android:name="${applicationName}"
@@ -33,6 +39,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${mapsApiKey}" />
+        <!-- Push notification appearance and channel -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/ic_launcher_background" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -40,6 +50,10 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

@@ -7,6 +7,7 @@ import 'features/auth/login_screen.dart';
 import 'features/auth/signup_eligibility.dart';
 import 'features/auth/splash_onboarding.dart';
 import 'features/home/shell_home.dart';
+import 'features/permissions/permissions_screen.dart';
 import 'features/profile/post_donation.dart';
 import 'features/profile/profile_settings.dart';
 import 'features/requests/map_screen.dart';
@@ -79,6 +80,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/eligibility',
         pageBuilder: (_, s) => _page(s, const EligibilityScreen()),
+      ),
+      GoRoute(
+        path: '/permissions',
+        pageBuilder: (_, s) => _page(s, const PermissionsScreen()),
       ),
       GoRoute(
         path: '/settings',

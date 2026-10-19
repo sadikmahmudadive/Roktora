@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'models.dart';
@@ -23,7 +24,14 @@ abstract class RoktoraRepository {
   Future<void> setCommitment(String requestId, bool committed);
   Future<void> postRequest(BloodRequest r);
 
-  Future<List<NearbyDonor>> nearbyDonors();
+  /// Donors near ([lat], [lng]) when known; distances are 0 for donors who haven't shared a location.
+  Future<List<NearbyDonor>> nearbyDonors({double? lat, double? lng});
+
+  /// Stores this device's push token so the backend can send alerts.
+  Future<void> saveFcmToken(String token);
+
+  /// Stores a coarse (~1 km) location for matching. Never the exact position.
+  Future<void> saveApproxLocation(double lat, double lng);
 
   Stream<List<ChatMessage>> messages(String requestId);
   Future<void> sendMessage(String requestId, String text);
@@ -127,23 +135,38 @@ class FirebaseRepository implements RoktoraRepository {
   Future<void> postRequest(BloodRequest r) => _db.collection('requests').add({...r.toMap(), 'createdBy': uid});
 
   @override
-  Future<List<NearbyDonor>> nearbyDonors() async {
-    // TODO: replace with a geohash range query once donors opt in to location.
-    final snap = await _db.collection('donors').where('available', isEqualTo: true).limit(30).get();
-    return snap.docs
-        .where((d) => d.id != uid && d.data()['bloodGroup'] != null)
-        .map((d) {
+  Future<List<NearbyDonor>> nearbyDonors({double? lat, double? lng}) async {
+    // Fetches available donors, then ranks by distance on the client. Swap for a geohash
+    // range query if the donor pool grows beyond a few hundred.
+    final snap = await _db.collection('donors').where('available', isEqualTo: true).limit(100).get();
+    final out = <NearbyDonor>[];
+    for (final d in snap.docs) {
       final m = d.data();
-      return NearbyDonor(
+      if (d.id == uid || m['bloodGroup'] == null) continue;
+      var km = 0.0;
+      final dLat = (m['approxLat'] as num?)?.toDouble();
+      final dLng = (m['approxLng'] as num?)?.toDouble();
+      if (lat != null && lng != null && dLat != null && dLng != null) {
+        km = (_haversineKm(lat, lng, dLat, dLng) * 10).round() / 10;
+      }
+      out.add(NearbyDonor(
         uid: d.id,
         name: (m['publicName'] ?? 'Donor') as String,
         bloodGroup: m['bloodGroup'] as String,
-        distanceKm: 0,
+        distanceKm: km,
         available: (m['available'] ?? true) as bool,
         donations: (m['donations'] ?? 0) as int,
-      );
-    }).toList();
+      ));
+    }
+    return out;
   }
+
+  @override
+  Future<void> saveFcmToken(String token) => _me.set({'fcmToken': token, 'fcmUpdatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+
+  @override
+  Future<void> saveApproxLocation(double lat, double lng) =>
+      _db.collection('donors').doc(uid).set({'approxLat': lat, 'approxLng': lng}, SetOptions(merge: true));
 
   @override
   Stream<List<DonationRecord>> donations() => _auth.authStateChanges().asyncExpand((u) => u == null ? Stream.value(<DonationRecord>[]) : _donations());
@@ -184,12 +207,12 @@ class DemoRepository implements RoktoraRepository {
     _requests = [
       BloodRequest(id: 'r1', bloodGroup: 'O−', title: '2 bags for cardiac surgery', place: 'Dhanmondi General', distanceKm: 1.2, bagsNeeded: 3,
           committed: 1, urgency: Urgency.critical, deadline: now.add(const Duration(hours: 3, minutes: 12)), postedBy: 'Tanvir A.',
-          note: 'Ward 4, 3rd floor · Road 7A', committedUids: const ['sadia']),
+          note: 'Ward 4, 3rd floor · Road 7A', committedUids: const ['sadia'], lat: 23.7466, lng: 90.3760),
       BloodRequest(id: 'r2', bloodGroup: 'O+', title: 'Thalassemia transfusion', place: 'Shishu Hospital', distanceKm: 2.8, bagsNeeded: 1,
-          committed: 0, urgency: Urgency.urgent, deadline: now.add(const Duration(hours: 9)), verified: true),
+          committed: 0, urgency: Urgency.urgent, deadline: now.add(const Duration(hours: 9)), verified: true, lat: 23.7737, lng: 90.3703),
       BloodRequest(id: 'r3', bloodGroup: 'Any', title: 'Weekend donation drive', place: 'Uttara Blood Bank', distanceKm: 6.0, bagsNeeded: 20,
           committed: 4, urgency: Urgency.routine, deadline: now.add(const Duration(days: 4)), verified: true,
-          committedUids: const ['a', 'b', 'c', 'd']),
+          committedUids: const ['a', 'b', 'c', 'd'], lat: 23.8759, lng: 90.3795),
     ];
     _messages = {
       'r1': [
@@ -277,7 +300,7 @@ class DemoRepository implements RoktoraRepository {
           BloodRequest(
             id: r.id, bloodGroup: r.bloodGroup, title: r.title, place: r.place, distanceKm: r.distanceKm, bagsNeeded: r.bagsNeeded,
             committed: r.committedUids.where((u) => u != _me).length + (committed ? 1 : 0), urgency: r.urgency, deadline: r.deadline,
-            verified: r.verified, postedBy: r.postedBy, note: r.note,
+            verified: r.verified, postedBy: r.postedBy, note: r.note, lat: r.lat, lng: r.lng,
             committedUids: [...r.committedUids.where((u) => u != _me), if (committed) _me],
           )
         else
@@ -293,7 +316,13 @@ class DemoRepository implements RoktoraRepository {
   }
 
   @override
-  Future<List<NearbyDonor>> nearbyDonors() async => const [
+  Future<void> saveFcmToken(String token) async {}
+
+  @override
+  Future<void> saveApproxLocation(double lat, double lng) async {}
+
+  @override
+  Future<List<NearbyDonor>> nearbyDonors({double? lat, double? lng}) async => const [
         NearbyDonor(uid: 'u1', name: 'Farhan H.', bloodGroup: 'O−', distanceKm: 0.6, available: true, donations: 7),
         NearbyDonor(uid: 'u2', name: 'Sadia K.', bloodGroup: 'O−', distanceKm: 0.9, available: true, donations: 3),
         NearbyDonor(uid: 'u3', name: 'Rafiq M.', bloodGroup: 'O−', distanceKm: 2.4, available: false, donations: 12),
@@ -335,4 +364,12 @@ class DemoRepository implements RoktoraRepository {
     _messages.putIfAbsent(requestId, () => []).add(ChatMessage(fromUid: _me, text: text, sentAt: DateTime.now()));
     _emit();
   }
+}
+
+double _haversineKm(double lat1, double lng1, double lat2, double lng2) {
+  const r = 6371.0;
+  double rad(double d) => d * pi / 180;
+  final dLat = rad(lat2 - lat1), dLng = rad(lng2 - lng1);
+  final a = pow(sin(dLat / 2), 2) + cos(rad(lat1)) * cos(rad(lat2)) * pow(sin(dLng / 2), 2);
+  return 2 * r * asin(sqrt(a));
 }

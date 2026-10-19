@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:roktora/core/permissions/permissions.dart';
 import 'package:roktora/data/models.dart';
 import 'package:roktora/data/providers.dart';
 import 'package:roktora/data/repository.dart';
 import 'package:roktora/main.dart';
+import 'package:roktora/router.dart';
 
 void main() {
   testWidgets('app boots to splash', (tester) async {
@@ -103,4 +106,125 @@ void main() {
       expect(navWidth(tester), closeTo(358, 1));
     });
   });
+
+  group('map screen', () {
+    setUpAll(() async {
+      SharedPreferences.setMockInitialValues({});
+      final loader = FontLoader('InstrumentSans')..addFont(rootBundle.load('assets/fonts/InstrumentSans-Variable.ttf'));
+      await loader.load();
+    });
+
+    testWidgets('lists donors and requests, and previews a request with directions', (tester) async {
+      tester.view.physicalSize = const Size(1170, 2532);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final repo = DemoRepository();
+      await repo.verifyCode('demo', '123456');
+      await repo.saveProfile(const DonorProfile(uid: 'demo-user', name: 'Nusrat Rahman', area: 'Dhanmondi, Dhaka', bloodGroup: 'O-'));
+      await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWithValue(repo)], child: const RoktoraApp()));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      ProviderScope.containerOf(tester.element(find.byType(RoktoraApp))).read(routerProvider).go('/map');
+      await tester.pumpAndSettle();
+
+      // Within 3 km of Dhanmondi: six donors and the one nearby hospital request.
+      expect(find.text('Donors · 6'), findsOneWidget);
+      expect(find.text('Requests · 1'), findsOneWidget);
+      expect(find.text('Farhan H.'), findsOneWidget);
+
+      await tester.tap(find.text('Requests · 1'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 bags for cardiac surgery'), findsOneWidget);
+      expect(find.text('Directions'), findsNothing);
+
+      await tester.tap(find.text('2 bags for cardiac surgery'));
+      await tester.pumpAndSettle();
+      // Selecting shows the preview card with its actions.
+      expect(find.text('Directions'), findsOneWidget);
+      expect(find.text('View'), findsOneWidget);
+
+      // Widening the filter to a group with no requests hides the selection.
+      await tester.tap(find.widgetWithText(ChoiceChip, 'A+'));
+      await tester.pumpAndSettle();
+      expect(find.text('Directions'), findsNothing);
+    });
+  });
+
+  group('permissions primer', () {
+    setUpAll(() async {
+      SharedPreferences.setMockInitialValues({});
+      final loader = FontLoader('InstrumentSans')..addFont(rootBundle.load('assets/fonts/InstrumentSans-Variable.ttf'));
+      await loader.load();
+    });
+
+    Future<_FakePermissions> pumpPrimer(WidgetTester tester, {PermStatus loc = PermStatus.denied, PermStatus notif = PermStatus.denied}) async {
+      tester.view.physicalSize = const Size(1170, 2532);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final fake = _FakePermissions(loc, notif);
+      final repo = DemoRepository();
+      await repo.verifyCode('demo', '123456');
+      await repo.saveProfile(const DonorProfile(uid: 'demo-user', name: 'Nusrat Rahman', area: 'Dhanmondi, Dhaka', bloodGroup: 'O-'));
+      await tester.pumpWidget(ProviderScope(
+        overrides: [repositoryProvider.overrideWithValue(repo), permissionApiProvider.overrideWithValue(fake)],
+        child: const RoktoraApp(),
+      ));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(tester.element(find.byType(RoktoraApp)));
+      container.read(routerProvider).go('/permissions');
+      await tester.pumpAndSettle();
+      return fake;
+    }
+
+    testWidgets('explains each permission and asks for both via Allow all', (tester) async {
+      final fake = await pumpPrimer(tester);
+      expect(find.text('Your location'), findsOneWidget);
+      expect(find.text('Notifications'), findsOneWidget);
+      expect(find.text('Allow location'), findsOneWidget);
+      expect(find.text('Allow notifications'), findsOneWidget);
+
+      await tester.tap(find.text('Allow all'));
+      await tester.pumpAndSettle();
+      expect(fake.calls, ['location', 'notifications']);
+      // Everything granted: the primer closes and Home shows.
+      expect(find.text('Reach the right people, fast'), findsNothing);
+    });
+
+    testWidgets('a refused permission offers Open settings instead of asking again', (tester) async {
+      final fake = await pumpPrimer(tester, loc: PermStatus.blocked, notif: PermStatus.granted);
+      expect(find.text('Open settings'), findsOneWidget);
+      await tester.tap(find.text('Open settings'));
+      await tester.pump();
+      expect(fake.calls, ['settings']);
+    });
+  });
+}
+
+/// Records which permission actions the UI triggers, without touching the platform.
+class _FakePermissions extends PermissionApi {
+  _FakePermissions(this.loc, this.notif);
+  PermStatus loc, notif;
+  final calls = <String>[];
+
+  @override
+  Future<PermSnapshot> read({required bool messagingAvailable}) async => PermSnapshot(location: loc, notifications: notif);
+
+  @override
+  Future<PermStatus> requestLocation() async {
+    calls.add('location');
+    return loc = PermStatus.granted;
+  }
+
+  @override
+  Future<PermStatus> requestNotifications() async {
+    calls.add('notifications');
+    return notif = PermStatus.granted;
+  }
+
+  @override
+  Future<void> openAppSettings() async => calls.add('settings');
+
+  @override
+  Future<({double lat, double lng})?> currentPosition() async => null;
 }

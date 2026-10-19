@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/notifications/push.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/tokens.dart';
 import 'data/providers.dart';
@@ -21,6 +23,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
     repo = FirebaseRepository();
   } catch (e) {
     debugPrint('Firebase not configured, running in demo mode: $e');
@@ -46,9 +49,11 @@ class RoktoraApp extends ConsumerWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ref.watch(themeModeProvider),
+      scaffoldMessengerKey: rootMessengerKey,
       routerConfig: ref.watch(routerProvider),
-      builder: (context, child) =>
-          ResponsiveFrame(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => AppBootstrap(
+        child: ResponsiveFrame(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

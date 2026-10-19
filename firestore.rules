@@ -22,7 +22,7 @@ service cloud.firestore {
     match /donors/{uid} {
       allow read: if signedIn();
       allow create, update: if isOwner(uid)
-        && request.resource.data.keys().hasOnly(['publicName', 'bloodGroup', 'area', 'available', 'donations']);
+        && request.resource.data.keys().hasOnly(['publicName', 'bloodGroup', 'area', 'available', 'donations', 'approxLat', 'approxLng']);
       allow delete: if false;
     }
 

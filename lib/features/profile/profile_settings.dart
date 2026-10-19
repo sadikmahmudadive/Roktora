@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/permissions/permissions.dart';
 import '../../core/theme/app_theme.dart';
+import '../permissions/permissions_screen.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/providers.dart';
@@ -135,6 +137,10 @@ class SettingsScreen extends ConsumerWidget {
             toggle('nearby', 'Other nearby requests', 'Batched, at most twice a day'),
             toggle('quiet', 'Quiet hours', '11 pm to 7 am'),
           ]),
+          section('Permissions', [
+            _PermissionRow(permission: AppPermission.location, icon: TablerIcons.map_pin, label: 'Location', note: 'Nearby requests and donors', divider: false),
+            const _PermissionRow(permission: AppPermission.notifications, icon: TablerIcons.bell_ringing, label: 'Notifications', note: 'Alerts for matching requests'),
+          ]),
           section('Appearance', [
             for (final (i, m) in [(ThemeMode.system, 'Match system'), (ThemeMode.light, 'Light'), (ThemeMode.dark, 'Dark')].indexed)
               InkWell(
@@ -148,6 +154,45 @@ class SettingsScreen extends ConsumerWidget {
           ]),
         ]),
       ),
+    );
+  }
+}
+
+class _PermissionRow extends ConsumerWidget {
+  const _PermissionRow({required this.permission, required this.icon, required this.label, required this.note, this.divider = true});
+  final AppPermission permission;
+  final IconData icon;
+  final String label, note;
+  final bool divider;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.rc;
+    final snap = ref.watch(permissionsProvider).value ?? const PermSnapshot();
+    final ok = permissionOk(permission, snap);
+    final status = permission == AppPermission.location ? snap.location : snap.notifications;
+    final known = status != PermStatus.unknown;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(border: divider ? Border(top: BorderSide(color: c.border)) : null),
+      child: Row(children: [
+        Icon(icon, size: 20, color: c.textSecondary),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text(ok ? '$note · On' : (known ? '$note · Off' : note), style: TextStyle(fontSize: 12, color: c.textSecondary)),
+          ]),
+        ),
+        if (ok)
+          Icon(TablerIcons.circle_check_filled, color: c.textSuccess, size: 22)
+        else if (known)
+          TextButton(
+            onPressed: () => actOnPermission(ref, permission, snap),
+            style: TextButton.styleFrom(backgroundColor: c.bgBrand, foregroundColor: c.textBrand, shape: const StadiumBorder()),
+            child: Text(status == PermStatus.blocked || (permission == AppPermission.location && snap.location == PermStatus.granted) ? 'Open settings' : 'Allow'),
+          ),
+      ]),
     );
   }
 }

@@ -72,9 +72,15 @@ class BloodRequest {
     this.postedBy = '',
     this.note = '',
     this.committedUids = const [],
+    this.lat,
+    this.lng,
   });
 
   final String id, bloodGroup, title, place, postedBy, note;
+
+  /// Where blood is needed (hospital or ward). Null for older requests, which then don't appear on the map.
+  final double? lat, lng;
+  bool get hasLocation => lat != null && lng != null;
   final double distanceKm;
   final int bagsNeeded, committed;
   final Urgency urgency;
@@ -88,6 +94,8 @@ class BloodRequest {
         'bloodGroup': bloodGroup, 'title': title, 'place': place, 'distanceKm': distanceKm,
         'bagsNeeded': bagsNeeded, 'urgency': urgency.name, 'deadline': Timestamp.fromDate(deadline),
         'verified': verified, 'postedBy': postedBy, 'note': note, 'committedUids': committedUids,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
       };
 
   factory BloodRequest.fromMap(String id, Map<String, dynamic> m) {
@@ -106,6 +114,8 @@ class BloodRequest {
       postedBy: (m['postedBy'] ?? '') as String,
       note: (m['note'] ?? '') as String,
       committedUids: uids,
+      lat: (m['lat'] as num?)?.toDouble(),
+      lng: (m['lng'] as num?)?.toDouble(),
     );
   }
 }

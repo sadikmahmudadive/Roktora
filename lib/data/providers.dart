@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/permissions/permissions.dart';
 import 'models.dart';
 import 'repository.dart';
 
@@ -15,7 +16,10 @@ final requestProvider =
 final messagesProvider =
     StreamProvider.family<List<ChatMessage>, String>((ref, id) => ref.watch(repositoryProvider).messages(id));
 final donationsProvider = StreamProvider<List<DonationRecord>>((ref) => ref.watch(repositoryProvider).donations());
-final nearbyDonorsProvider = FutureProvider<List<NearbyDonor>>((ref) => ref.watch(repositoryProvider).nearbyDonors());
+final nearbyDonorsProvider = FutureProvider<List<NearbyDonor>>((ref) async {
+  final pos = ref.watch(userLocationProvider).value;
+  return ref.watch(repositoryProvider).nearbyDonors(lat: pos?.lat, lng: pos?.lng);
+});
 
 /// Persists light/dark/system choice.
 class ThemeModeNotifier extends Notifier<ThemeMode> {
