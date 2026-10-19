@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "171688562337",
+    "project_id": "roktora",
+    "storage_bucket": "roktora.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171688562337:android:38e7e9843bac84524e6ae0",
+        "android_client_info": {
+          "package_name": "com.vertexhand.roktora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIa2bWNz8SSoKNKfyAm2UljZ_cvNOFDhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

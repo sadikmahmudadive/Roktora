@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root,[data-theme=light]{color-scheme:light;--surface-0:#f3f2ef;--surface-1:#ffffff;--surface-2:#eae8e3;--surface-3:#ffffff;--text-primary:#141413;--text-secondary:#55534d;--text-muted:#76736c;--text-disabled:#b3b0a8;--text-accent:#1d5fbf;--text-danger:#b3261e;--text-success:#1b6b3c;--text-warning:#7f4c00;--text-brand:#b01a30;--border:rgba(20,20,19,.1);--border-strong:rgba(20,20,19,.2);--border-stronger:rgba(20,20,19,.4);--border-accent:#2f6fd1;--border-danger:#c8321f;--border-success:#2b8a4b;--border-warning:#c98a12;--fill-primary:#141413;--fill-accent:#2f6fd1;--fill-danger:#c8321f;--fill-success:#22995a;--fill-warning:#b97c0c;--fill-brand:#d42a40;--on-fill:#ffffff;--on-primary:#f7f6f3;--bg-accent:#e6eefb;--bg-danger:#fce9e6;--bg-success:#e2f3e8;--bg-warning:#fcf0d8;--bg-brand:#fde8ea;--progress-track:rgba(20,20,19,.08);--progress-fill:#d42a40;--hover:rgba(20,20,19,.04);--press:rgba(20,20,19,.08);--shadow-1:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);--shadow-2:0 2px 6px rgba(20,20,19,.06),0 18px 40px -12px rgba(20,20,19,.18);--glass:rgba(243,242,239,.78)}
+[data-theme=dark]{color-scheme:dark;--surface-0:#121211;--surface-1:#1d1c1b;--surface-2:#282725;--surface-3:#323130;--text-primary:#f4f2ec;--text-secondary:#c2bfb7;--text-muted:#9a978f;--text-disabled:#5f5d58;--text-accent:#8fb5f3;--text-danger:#f2a093;--text-success:#8dd3a5;--text-warning:#ecc679;--text-brand:#ff9aa7;--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.18);--border-stronger:rgba(255,255,255,.36);--border-accent:#5b92e6;--border-danger:#e0614e;--border-success:#4aa86a;--border-warning:#d69b2a;--fill-primary:#f4f2ec;--fill-accent:#3d7ddb;--fill-danger:#cf4632;--fill-success:#2f9f5f;--fill-warning:#b57f14;--fill-brand:#e5384e;--on-fill:#ffffff;--on-primary:#121211;--bg-accent:#1b2740;--bg-danger:#3a1f1b;--bg-success:#18301f;--bg-warning:#382c15;--bg-brand:#3b171d;--progress-track:rgba(255,255,255,.1);--progress-fill:#e5384e;--hover:rgba(255,255,255,.05);--press:rgba(255,255,255,.1);--shadow-1:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--shadow-2:0 2px 6px rgba(0,0,0,.3),0 18px 40px -12px rgba(0,0,0,.6);--glass:rgba(18,18,17,.75)}
+:root{--radius:14px;--radius-card:24px;--font-sans:"Instrument Sans","Hind Siliguri",system-ui,sans-serif;--font-voice:"Source Serif 4",Georgia,serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--dur-fast:90ms;--dur-snap:140ms;--dur-base:220ms;--dur-slow:360ms;--ease-out:cubic-bezier(.2,.7,.2,1);--ease-snap:cubic-bezier(.3,0,.2,1);--ease-overshoot:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box}body{margin:0;font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+a{color:var(--text-accent);text-decoration:none;font-weight:600}a:hover{text-decoration:underline}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--border-accent);outline-offset:2px}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100vh;background:var(--surface-0);color:var(--text-primary);font-family:var(--font-sans);font-size:14px;line-height:1.5;transition:background var(--dur-base) var(--ease-out)">
+  <header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 24px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-0.02em"><svg viewBox="520 440 702 1040" style="height:26px;width:auto;flex:none;display:block" aria-hidden="true"><path style="fill:var(--fill-brand)" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>Roktora</div>
+    <nav style="display:flex;gap:2px;flex-wrap:wrap;padding:4px;border-radius:999px;background:var(--surface-1);border:1px solid var(--border)">
+      <a href="00 Components v2.dc.html" style="padding:6px 14px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)" style-hover="text-decoration:none">Components</a>
+      <a href="01 Mobile - Onboarding and auth v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Onboarding and auth</a>
+      <a href="02 Mobile - Donor core v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Donor core loop</a>
+      <a href="03 Mobile - Post-donation and profile v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Post-donation</a>
+      <a href="04 Hospital dashboard v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Hospital</a>
+    </nav>
+    <span style="flex:1"></span>
+    <button onClick="{{ toggleTheme }}" aria-label="Toggle theme" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface-1);cursor:pointer;font-weight:600" style-hover="background:var(--surface-2)"><i class="ti {{ themeIcon }}" style="font-size:17px"></i>{{ themeLabel }}</button>
+  </header>
+
+  <main style="max-width:1200px;margin:0 auto;padding:40px 24px 80px;display:flex;flex-direction:column;gap:32px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:680px">
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">Reference sheet · 6 shared primitives</div>
+      <h1 style="margin:0;font-weight:600;font-size:40px;line-height:1.05;letter-spacing:-0.035em">The parts every Roktora screen is built from</h1>
+      <p style="margin:0;color:var(--text-secondary);text-wrap:pretty">Each primitive uses role tokens only, so light and dark modes come for free. Status lives in color roles; urgency lives in a 2px stripe; trust lives in one badge shape.</p>
+    </div>
+
+    <section style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface-1);overflow:hidden">
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px;border-bottom:1px solid var(--border)">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">01</div>
+          <div style="font-weight:600;font-size:16px">BloodGroupPill</div>
+          <p style="margin:0;color:var(--text-secondary);font-size:13px;text-wrap:pretty">bg-{role} + text-{role}. Danger for Rh-negative shortages, warning for low, success for healthy, neutral when there's no stock context. Selected state adds a 2px accent border.</p>
+        </div>
+        <div style="flex:999 1 400px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+            <span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:13px">O−</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-warning);color:var(--text-warning);font-weight:600;font-size:13px">B+</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-success);color:var(--text-success);font-weight:600;font-size:13px">A+</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:13px">AB+</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:11px">AB−</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,56px);gap:8px">
+            <sc-for list="{{ groups }}" as="g" hint-placeholder-count="8">
+              <button onClick="{{ g.pick }}" style="height:44px;border-radius:999px;border:{{ g.border }};background:{{ g.bg }};color:{{ g.color }};font-weight:600;font-size:15px;cursor:pointer;transition:background var(--dur-snap) var(--ease-snap)">{{ g.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">Picker variant — tap to select. Used in sign-up and filters.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px;border-bottom:1px solid var(--border)">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">02</div>
+          <div style="font-weight:600;font-size:16px">UrgencyRow</div>
+          <p style="margin:0;color:var(--text-secondary);font-size:13px;text-wrap:pretty">A 2px left stripe carries urgency so the row can stay flat: border-danger critical, border-warning urgent, border routine. The time-left label repeats the role in text for color-blind users.</p>
+        </div>
+        <div style="flex:999 1 400px;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-left:2px solid var(--border-danger);cursor:pointer;transition:background var(--dur-snap) var(--ease-snap)" style-hover="background:var(--hover)">
+            <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:13px">O−</span>
+            <div style="flex:1;min-width:0"><div style="font-weight:600">2 bags for surgery</div><div style="font-size:13px;color:var(--text-secondary)">Dhanmondi General · 1.2 km</div></div>
+            <div style="text-align:right"><div style="font-size:13px;color:var(--text-danger);font-weight:600">Critical</div><div style="font-size:12px;color:var(--text-muted)">Needed in 3 h</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-left:2px solid var(--border-warning);border-top:1px solid var(--border);cursor:pointer" style-hover="background:var(--hover)">
+            <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-warning);color:var(--text-warning);font-weight:600;font-size:13px">B+</span>
+            <div style="flex:1;min-width:0"><div style="font-weight:600">1 bag, thalassemia transfusion</div><div style="font-size:13px;color:var(--text-secondary)">Mirpur Central · 3.4 km</div></div>
+            <div style="text-align:right"><div style="font-size:13px;color:var(--text-warning);font-weight:600">Urgent</div><div style="font-size:12px;color:var(--text-muted)">Today</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-left:2px solid var(--border);border-top:1px solid var(--border);cursor:pointer" style-hover="background:var(--hover)">
+            <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:13px">A+</span>
+            <div style="flex:1;min-width:0"><div style="font-weight:600">Scheduled donation drive</div><div style="font-size:13px;color:var(--text-secondary)">Uttara Blood Bank · 6.0 km</div></div>
+            <div style="text-align:right"><div style="font-size:13px;color:var(--text-secondary);font-weight:600">Routine</div><div style="font-size:12px;color:var(--text-muted)">Sat, 24 Oct</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px;border-bottom:1px solid var(--border)">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">03</div>
+          <div style="font-weight:600;font-size:16px">VerifiedBadge</div>
+          <p style="margin:0;color:var(--text-secondary);font-size:13px;text-wrap:pretty">One shape everywhere: a fill-accent disc with a check, label in text-accent. Unverified sources never get a lookalike — they get a neutral outline and plain words.</p>
+        </div>
+        <div style="flex:999 1 400px;display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+          <span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-accent);font-weight:600;font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span>Verified hospital</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-weight:600">Dhanmondi General Hospital<span style="width:16px;height:16px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span></span>
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:15px"><i class="ti ti-check"></i></span>
+          <span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:13px"><span style="width:16px;height:16px;border-radius:50%;border:1px solid var(--border-stronger);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-user"></i></span>Individual request · not verified</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px;border-bottom:1px solid var(--border)">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">04</div>
+          <div style="font-weight:600;font-size:16px">DonorAvatar</div>
+          <p style="margin:0;color:var(--text-secondary);font-size:13px;text-wrap:pretty">Initials on surface-2, never a photo by default — privacy first. Optional availability dot (fill-success) and blood group pill. Anonymized donors show a neutral glyph.</p>
+        </div>
+        <div style="flex:999 1 400px;display:flex;flex-wrap:wrap;gap:28px;align-items:center">
+          <span style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">NR</span>
+          <span style="position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">TA<span style="position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:var(--fill-success);border:2px solid var(--surface-1)"></span></span>
+          <span style="position:relative;width:56px;height:56px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:600">AK<span style="position:absolute;right:-8px;bottom:-4px;display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:11px;border:2px solid var(--surface-1)">O−</span></span>
+          <span style="width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-muted)"><i class="ti ti-user"></i></span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">FH<span style="position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:var(--fill-success);border:2px solid var(--surface-1)"></span></span>
+            <div><div style="font-weight:600">Farhan H.</div><div style="font-size:12px;color:var(--text-secondary)">B+ · 600 m · 7 donations</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px;border-bottom:1px solid var(--border)">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">05</div>
+          <div style="font-weight:600;font-size:16px">RequestCard</div>
+          <p style="margin:0;color:var(--text-secondary);font-size:13px;text-wrap:pretty">In-flow tile (surface-1, hairline, 12px). Composes pill + verified badge + progress. The single accent button is the commit action; secondary actions stay quiet.</p>
+        </div>
+        <div style="flex:999 1 400px;display:flex;flex-wrap:wrap;gap:16px">
+          <div style="flex:1 1 300px;max-width:380px;display:flex;flex-direction:column;gap:14px;padding:16px;border:1px solid var(--border);border-left:2px solid var(--border-danger);border-radius:var(--radius-card);background:var(--surface-1)">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:13px">O−</span>
+              <span style="font-size:13px;color:var(--text-danger);font-weight:600">Critical · needed in 3 h</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--text-muted)">1.2 km</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-weight:600;font-size:16px">2 bags for cardiac surgery</div>
+              <span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-accent);font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span>Dhanmondi General Hospital</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary)"><span>{{ committed }} of 2 donors committed</span><span>{{ pct }}%</span></div>
+              <div style="height:6px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="height:100%;width:{{ pct }}%;background:var(--progress-fill);border-radius:999px;transition:width var(--dur-base) var(--ease-out)"></div></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ commit }}" style="flex:1;height:44px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer;transition:opacity var(--dur-snap) var(--ease-snap)" style-active="opacity:.85">{{ commitLabel }}</button>
+              <button style="width:44px;height:44px;border-radius:50%;border:1px solid var(--border-strong);background:transparent;cursor:pointer;font-size:18px" style-hover="background:var(--hover)" aria-label="Share request"><i class="ti ti-share"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">06</div>
+          <div style="font-weight:600;font-size:16px">EligibilityStepper</div>
+          <p style="margin:0;color:var(--text-secondary);font-size:13px;text-wrap:pretty">Five segments on the progress track. Done steps fill with progress-fill, current shows a numbered label, upcoming stays on track. Tap a segment to preview.</p>
+        </div>
+        <div style="flex:999 1 400px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+              <button onClick="{{ s.go }}" style="flex:1;display:flex;flex-direction:column;gap:8px;padding:0;border:0;background:transparent;cursor:pointer;text-align:left">
+                <span style="display:block;width:100%;height:4px;border-radius:999px;background:{{ s.bar }};transition:background var(--dur-base) var(--ease-out)"></span>
+                <span style="font-size:12px;color:{{ s.color }}">{{ s.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary)">Step {{ stepNum }} of 5 · {{ stepName }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-wrap:wrap;gap:16px">
+      <div style="flex:1 1 260px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface-1);display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:600">Elevation</div>
+        <div style="font-size:13px;color:var(--text-secondary);text-wrap:pretty">No shadows. Floating planes (sheets, drawers) sit on surface-3 with a 0.5px border-strong. Two planes max.</div>
+      </div>
+      <div style="flex:1 1 260px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface-1);display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:600">Type</div>
+        <div style="font-size:13px;color:var(--text-secondary);text-wrap:pretty">font-sans 400/500 for UI, font-voice for editorial moments (onboarding, thank-you notes), font-mono for IDs and codes.</div>
+      </div>
+      <div style="flex:1 1 260px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface-1);display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:600">Font substitution</div>
+        <div style="font-size:13px;color:var(--text-secondary);text-wrap:pretty">Anthropic Sans isn't web-licensed here, so --font-sans maps to Instrument Sans with Hind Siliguri for Bangla. Swap the token to switch.</div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: localStorage.getItem('ld-theme') || 'light', sel: 'O−', committed: 1, step: 2 };
+  renderVals() {
+    const { theme, sel, committed, step } = this.state;
+    const roles = { 'O−': 'danger', 'AB−': 'danger', 'B+': 'warning', 'A+': 'success' };
+    const names = ['Health', 'Last donation', 'Medication', 'Travel', 'Confirm'];
+    return {
+      theme,
+      themeLabel: theme === 'dark' ? 'Light' : 'Dark', themeIcon: theme === 'dark' ? 'ti-sun' : 'ti-moon',
+      toggleTheme: () => { const t = theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('ld-theme', t); this.setState({ theme: t }); },
+      groups: ['A+', 'A−', 'B+', 'B−', 'O+', 'O−', 'AB+', 'AB−'].map(g => {
+        const on = g === sel;
+        return { label: g, pick: () => this.setState({ sel: g }),
+          border: on ? '1.5px solid var(--fill-brand)' : '1px solid var(--border-strong)',
+          bg: on ? 'var(--bg-brand)' : 'var(--surface-1)', color: on ? 'var(--text-brand)' : 'var(--text-primary)' };
+      }),
+      committed, pct: Math.round(committed / 2 * 100),
+      commitLabel: committed >= 2 ? 'Committed' : 'Commit to donate',
+      commit: () => this.setState({ committed: committed >= 2 ? 1 : 2 }),
+      steps: names.map((n, i) => ({ label: i === step ? `${i + 1}. ${n}` : n, go: () => this.setState({ step: i }),
+        bar: i <= step ? 'var(--fill-brand)' : 'var(--progress-track)',
+        color: i === step ? 'var(--text-primary)' : i < step ? 'var(--text-secondary)' : 'var(--text-muted)' })),
+      stepNum: step + 1, stepName: names[step]
+    };
+  }
+}
+</script>
+</body>
+</html>

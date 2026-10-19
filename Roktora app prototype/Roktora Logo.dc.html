@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Instrument Sans","Hind Siliguri",system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#f3f2ef;color:#141413}
+a{color:#1d5fbf;text-decoration:none}a:hover{text-decoration:underline}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:48px 40px 80px;display:flex;flex-direction:column;gap:40px;max-width:1240px;margin:0 auto">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:640px">
+    <span style="align-self:flex-start;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:#fde8ea;color:#b01a30">Brand · logo</span>
+    <h1 style="margin:0;font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Roktora</h1>
+    <p style="margin:0;font-size:16px;color:#55534d;text-wrap:pretty">A single drop with a curved highlight cut out of its left side. The tip leans right, as if it's moving toward someone who needs it.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:20px">
+    <div id="1a" style="grid-column:1/-1;min-height:380px;border-radius:32px;background:#ffffff;box-shadow:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);display:flex;align-items:center;justify-content:center;position:relative">
+      <span style="position:absolute;left:20px;top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#141413;color:#f7f6f3">Primary lockup</span>
+      <div style="display:flex;align-items:center;gap:22px">
+        <svg viewBox="520 440 702 1040" style="height:132px;width:auto;display:block" aria-label="Roktora"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:88px;font-weight:700;letter-spacing:-0.055em;line-height:.9">Roktora</span>
+          <span style="font-family:'Hind Siliguri',sans-serif;font-size:24px;font-weight:600;color:#76736c;padding-left:4px">রক্তরা</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="min-height:300px;border-radius:32px;background:#d42a40;color:#fff;display:flex;align-items:center;justify-content:center;position:relative">
+      <span style="position:absolute;left:20px;top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.2);color:#fff">Reversed on brand</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <svg viewBox="520 440 702 1040" style="height:72px;width:auto;display:block"><path style="fill:#ffffff" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>
+        <span style="font-size:48px;font-weight:700;letter-spacing:-0.05em;line-height:1">Roktora</span>
+      </div>
+    </div>
+
+    <div id="1c" style="min-height:300px;border-radius:32px;background:#121211;color:#f4f2ec;display:flex;align-items:center;justify-content:center;position:relative">
+      <span style="position:absolute;left:20px;top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.12);color:#f4f2ec">Dark mode</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <svg viewBox="520 440 702 1040" style="height:72px;width:auto;display:block"><path style="fill:#e5384e" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>
+        <span style="font-size:48px;font-weight:700;letter-spacing:-0.05em;line-height:1">Roktora</span>
+      </div>
+    </div>
+
+    <div id="1d" style="min-height:300px;border-radius:32px;background:#ffffff;box-shadow:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;position:relative;padding:56px 20px 24px">
+      <span style="position:absolute;left:20px;top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#141413;color:#f7f6f3">App icon</span>
+      <div style="display:flex;align-items:flex-end;gap:20px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="width:120px;height:120px;border-radius:28px;background:#d42a40;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px -10px rgba(212,42,64,.6)"><svg viewBox="520 440 702 1040" style="height:66px;width:auto;display:block"><path style="fill:#ffffff" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg></div>
+          <span style="font-size:12px;color:#55534d">Primary</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="width:120px;height:120px;border-radius:28px;background:#ffffff;border:1px solid rgba(20,20,19,.1);display:flex;align-items:center;justify-content:center"><svg viewBox="520 440 702 1040" style="height:66px;width:auto;display:block"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg></div>
+          <span style="font-size:12px;color:#55534d">Light</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1e" style="min-height:300px;border-radius:32px;background:#ffffff;box-shadow:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);display:flex;flex-direction:column;justify-content:center;gap:28px;position:relative;padding:64px 32px 32px">
+      <span style="position:absolute;left:20px;top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#141413;color:#f7f6f3">Small sizes</span>
+      <div style="display:flex;align-items:flex-end;gap:28px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><svg viewBox="520 440 702 1040" style="height:48px;width:auto;display:block"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#76736c">48</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><svg viewBox="520 440 702 1040" style="height:32px;width:auto;display:block"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#76736c">32</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><svg viewBox="520 440 702 1040" style="height:24px;width:auto;display:block"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#76736c">24</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><svg viewBox="520 440 702 1040" style="height:16px;width:auto;display:block"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#76736c">16</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px"><svg viewBox="520 440 702 1040" style="height:24px;width:auto;display:block"><path style="fill:#d42a40" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg><span style="font-size:18px;font-weight:700;letter-spacing:-0.03em">Roktora</span><span style="font-size:13px;color:#76736c;margin-left:8px">App header size</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:#55534d">
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid rgba(20,20,19,.1)"><span style="width:14px;height:14px;border-radius:50%;background:#d42a40"></span>Brand red #D42A40</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid rgba(20,20,19,.1)"><span style="width:14px;height:14px;border-radius:50%;background:#e5384e"></span>Dark-mode red #E5384E</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid rgba(20,20,19,.1)">Files: <a href="roktora-mark.svg">roktora-mark.svg</a> · <a href="roktora-mark-white.svg">white</a> · <a href="roktora-app-icon.svg">app icon</a></span>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

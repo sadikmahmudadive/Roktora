@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root,[data-theme=light]{color-scheme:light;--surface-0:#f3f2ef;--surface-1:#ffffff;--surface-2:#eae8e3;--surface-3:#ffffff;--text-primary:#141413;--text-secondary:#55534d;--text-muted:#76736c;--text-disabled:#b3b0a8;--text-accent:#1d5fbf;--text-danger:#b3261e;--text-success:#1b6b3c;--text-warning:#7f4c00;--text-brand:#b01a30;--border:rgba(20,20,19,.1);--border-strong:rgba(20,20,19,.2);--border-stronger:rgba(20,20,19,.4);--border-accent:#2f6fd1;--border-danger:#c8321f;--border-success:#2b8a4b;--border-warning:#c98a12;--fill-primary:#141413;--fill-accent:#2f6fd1;--fill-danger:#c8321f;--fill-success:#22995a;--fill-warning:#b97c0c;--fill-brand:#d42a40;--on-fill:#ffffff;--on-primary:#f7f6f3;--bg-accent:#e6eefb;--bg-danger:#fce9e6;--bg-success:#e2f3e8;--bg-warning:#fcf0d8;--bg-brand:#fde8ea;--progress-track:rgba(20,20,19,.08);--progress-fill:#d42a40;--hover:rgba(20,20,19,.04);--press:rgba(20,20,19,.08);--shadow-1:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);--shadow-2:0 2px 6px rgba(20,20,19,.06),0 18px 40px -12px rgba(20,20,19,.18);--glass:rgba(243,242,239,.78);--map-road:#e6e3dc;--map-block:#f3f1ec}
+[data-theme=dark]{color-scheme:dark;--surface-0:#121211;--surface-1:#1d1c1b;--surface-2:#282725;--surface-3:#323130;--text-primary:#f4f2ec;--text-secondary:#c2bfb7;--text-muted:#9a978f;--text-disabled:#5f5d58;--text-accent:#8fb5f3;--text-danger:#f2a093;--text-success:#8dd3a5;--text-warning:#ecc679;--text-brand:#ff9aa7;--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.18);--border-stronger:rgba(255,255,255,.36);--border-accent:#5b92e6;--border-danger:#e0614e;--border-success:#4aa86a;--border-warning:#d69b2a;--fill-primary:#f4f2ec;--fill-accent:#3d7ddb;--fill-danger:#cf4632;--fill-success:#2f9f5f;--fill-warning:#b57f14;--fill-brand:#e5384e;--on-fill:#ffffff;--on-primary:#121211;--bg-accent:#1b2740;--bg-danger:#3a1f1b;--bg-success:#18301f;--bg-warning:#382c15;--bg-brand:#3b171d;--progress-track:rgba(255,255,255,.1);--progress-fill:#e5384e;--hover:rgba(255,255,255,.05);--press:rgba(255,255,255,.1);--shadow-1:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--shadow-2:0 2px 6px rgba(0,0,0,.3),0 18px 40px -12px rgba(0,0,0,.6);--glass:rgba(18,18,17,.75);--map-road:#33322e;--map-block:#282724}
+:root{--radius:14px;--radius-card:24px;--font-sans:"Instrument Sans","Hind Siliguri",system-ui,sans-serif;--font-voice:"Source Serif 4",Georgia,serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--dur-fast:90ms;--dur-snap:140ms;--dur-base:220ms;--dur-slow:360ms;--ease-out:cubic-bezier(.2,.7,.2,1);--ease-snap:cubic-bezier(.3,0,.2,1);--ease-overshoot:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box}body{margin:0;font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+a{color:var(--text-accent);text-decoration:none;font-weight:600}a:hover{text-decoration:underline}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--border-accent);outline-offset:2px}
+input::placeholder{color:var(--text-muted)}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100vh;background:var(--surface-0);color:var(--text-primary);font-family:var(--font-sans);font-size:14px;line-height:1.5">
+  <header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 24px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-0.02em"><svg viewBox="520 440 702 1040" style="height:26px;width:auto;flex:none;display:block" aria-hidden="true"><path style="fill:var(--fill-brand)" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>Roktora</div>
+    <nav style="display:flex;gap:2px;flex-wrap:wrap;padding:4px;border-radius:999px;background:var(--surface-1);border:1px solid var(--border)">
+      <a href="00 Components v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Components</a>
+      <a href="01 Mobile - Onboarding and auth v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Onboarding and auth</a>
+      <a href="02 Mobile - Donor core v2.dc.html" style="padding:6px 14px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)" style-hover="text-decoration:none">Donor core loop</a>
+      <a href="03 Mobile - Post-donation and profile v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Post-donation</a>
+      <a href="04 Hospital dashboard v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Hospital</a>
+    </nav>
+    <span style="flex:1"></span>
+    <button onClick="{{ toggleTheme }}" aria-label="Toggle theme" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface-1);cursor:pointer;font-weight:600" style-hover="background:var(--surface-2)"><i class="ti {{ themeIcon }}" style="font-size:17px"></i>{{ themeLabel }}</button>
+  </header>
+  <section style="padding:40px 40px 8px;display:flex;flex-direction:column;gap:8px;max-width:760px">
+    <div style="display:flex;gap:8px;align-items:center"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg-brand);color:var(--text-brand)">v2 · refresh</span><span style="font-size:13px;color:var(--text-muted)">5 screens</span></div>
+    <h1 style="margin:0;font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Donor core loop</h1>
+    <p style="margin:0;font-size:16px;color:var(--text-secondary);text-wrap:pretty">Home, map, requests, and chat — the loop a donor runs every time someone nearby needs blood.</p>
+  </section>
+
+  <section style="padding:32px 40px 64px;display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+
+    <div id="6" style="width:390px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">06</span><span style="font-weight:600">Home · donor dashboard</span></div>
+      <div data-screen-label="06 Home" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column"><div style="position:absolute;z-index:20;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary);pointer-events:none"></div>
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-2"></i><i class="ti ti-wifi-off"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;padding:8px 16px 16px">
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 4px">
+            <div style="flex:1"><div style="font-size:13px;color:var(--text-muted)">Dhanmondi, Dhaka</div><div style="font-size:26px;font-weight:600;letter-spacing:-0.03em">Good evening, Nusrat</div></div>
+            <button aria-label="Notifications" style="position:relative;width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--surface-1);cursor:pointer;font-size:20px"><i class="ti ti-bell"></i><span style="position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--fill-danger)"></span></button>
+          </div>
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);background:var(--surface-2);font-size:13px;color:var(--text-secondary)"><i class="ti ti-cloud-off" style="font-size:16px"></i><span style="flex:1">You're offline. Showing requests from 2 min ago.</span></div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:14px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="position:relative;width:48px;height:48px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:600">NR</span>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:12px">O−</span><span style="display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;background:var(--bg-success);color:var(--text-success);font-weight:600;font-size:12px"><i class="ti ti-circle-check"></i>Eligible now</span></div>
+                <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">7 donations · last on 14 Jun</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary)"><span>Recovery since last donation</span><span>Complete</span></div>
+              <div style="height:6px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:100%;height:100%;background:var(--fill-success);border-radius:999px"></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding-top:12px;border-top:1px solid var(--border)">
+              <div style="flex:1"><div style="font-weight:600">Available for alerts</div><div style="font-size:12px;color:var(--text-secondary)">O− requests within 5 km</div></div>
+              <button onClick="{{ toggleAvail }}" aria-label="Available for alerts" style="width:48px;height:28px;flex:none;border-radius:999px;border:0;padding:3px;background:{{ availTrack }};cursor:pointer;display:flex;justify-content:{{ availJustify }};transition:background var(--dur-snap) var(--ease-snap)"><span style="width:22px;height:22px;border-radius:50%;background:var(--surface-1)"></span></button>
+            </div>
+          </div>
+          <div style="flex-shrink:0;display:flex;align-items:baseline;justify-content:space-between;padding:4px 4px 0"><span style="font-weight:600;font-size:16px">Near you</span><a href="#7" style="font-size:13px">See map</a></div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--border);border-left:2px solid var(--border-danger);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+            <div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:12px">O−</span><span style="font-size:13px;color:var(--text-danger);font-weight:600">Critical · by 9 pm</span><span style="margin-left:auto;font-size:12px;color:var(--text-muted)">1.2 km</span></div>
+            <div><div style="font-weight:600;font-size:15px">2 bags for cardiac surgery</div><div style="font-size:13px;color:var(--text-secondary)">Dhanmondi General · 15 min walk</div></div>
+            <div style="height:6px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:50%;height:100%;background:var(--progress-fill);border-radius:999px"></div></div>
+            <a href="#8" style="height:44px;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;display:flex;align-items:center;justify-content:center;text-decoration:none">View request</a>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-left:2px solid var(--border-warning)">
+              <span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:var(--bg-warning);color:var(--text-warning);font-weight:600;font-size:12px">O+</span>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">Thalassemia transfusion</div><div style="font-size:12px;color:var(--text-secondary)">Shishu Hospital · 2.8 km</div></div>
+              <span style="font-size:12px;color:var(--text-warning);font-weight:600">Today</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-left:2px solid var(--border);border-top:1px solid var(--border)">
+              <span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:12px">Any</span>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">Weekend donation drive</div><div style="font-size:12px;color:var(--text-secondary)">Uttara Blood Bank · 6.0 km</div></div>
+              <span style="font-size:12px;color:var(--text-muted)">Sat</span>
+            </div>
+          </div>
+          <button style="flex-shrink:0;height:48px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:var(--hover)"><i class="ti ti-plus"></i>Post a request for someone</button>
+        </div>
+        <nav style="height:86px;flex:none;display:flex;border-top:1px solid var(--border);background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:4px 8px 22px">
+          <a style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--text-brand);text-decoration:none"><i class="ti ti-home" style="font-size:22px"></i>Home</a>
+          <a href="#7" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--text-muted);text-decoration:none"><i class="ti ti-map-2" style="font-size:22px"></i>Map</a>
+          <a style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--text-muted);text-decoration:none"><i class="ti ti-message-circle" style="font-size:22px"></i>Chats</a>
+          <a style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--text-muted);text-decoration:none"><i class="ti ti-id-badge-2" style="font-size:22px"></i>Passport</a>
+          <a style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--text-muted);text-decoration:none"><i class="ti ti-user-circle" style="font-size:22px"></i>Profile</a>
+        </nav>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Answers "can I donate?" and "who needs me?" in one scroll, even offline.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · Eligibility tile, RequestCard for the top match, UrgencyRows for the rest.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Only the most urgent request gets a full card; others compress to rows.</div>
+      </div>
+    </div>
+
+    <div id="7" style="width:390px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">07</span><span style="font-weight:600">Nearby donors map</span></div>
+      <div data-screen-label="07 Map" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--map-block);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border)"><div style="position:absolute;z-index:20;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary);pointer-events:none"></div>
+        <div style="position:absolute;left:0;right:0;top:250px;height:14px;background:var(--map-road)"></div>
+        <div style="position:absolute;left:0;right:0;top:470px;height:10px;background:var(--map-road)"></div>
+        <div style="position:absolute;top:0;bottom:0;left:120px;width:12px;background:var(--map-road)"></div>
+        <div style="position:absolute;top:0;bottom:0;left:280px;width:8px;background:var(--map-road)"></div>
+        <div style="position:absolute;left:150px;top:290px;width:110px;height:150px;border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);border:1px solid var(--border)"></div>
+        <div style="position:absolute;left:20px;top:60px;width:80px;height:170px;border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);border:1px solid var(--border)"></div>
+        <div style="position:absolute;left:300px;top:500px;width:70px;height:90px;border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);border:1px solid var(--border)"></div>
+        <span style="position:absolute;left:160px;top:410px;font-size:11px;color:var(--text-muted)">Dhanmondi Lake</span>
+        <div style="position:absolute;left:175px;top:340px;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:1px solid var(--border-accent);background:var(--bg-accent);opacity:.7"></div>
+        <div style="position:absolute;left:175px;top:340px;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--fill-accent);border:3px solid var(--surface-1)"></div>
+        <sc-for list="{{ pins }}" as="p" hint-placeholder-count="6">
+          <div style="position:absolute;left:{{ p.x }}px;top:{{ p.y }}px;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:{{ p.fill }};border:2px solid var(--surface-1);color:var(--on-fill);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">{{ p.g }}</div>
+        </sc-for>
+        <div style="position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;gap:10px;padding:0 0 10px;background:var(--surface-0);border-bottom:1px solid var(--border)">
+          <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+          <div style="display:flex;gap:8px;padding:0 16px">
+            <div style="flex:1;height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--surface-1);color:var(--text-muted)"><i class="ti ti-search"></i>Dhanmondi, Dhaka</div>
+            <div style="display:flex;border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;background:var(--surface-1)">
+              <sc-for list="{{ radii }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.pick }}" style="width:48px;height:44px;border:0;background:{{ r.bg }};color:{{ r.color }};font-size:13px;cursor:pointer">{{ r.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;padding:0 16px;overflow-x:auto;scrollbar-width:none">
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="9">
+              <button onClick="{{ c.pick }}" style="flex:none;height:36px;padding:0 12px;border-radius:999px;border:{{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-weight:600;font-size:13px;cursor:pointer;transition:background var(--dur-snap) var(--ease-snap)">{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="position:absolute;right:16px;top:540px;display:flex;flex-direction:column;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-1);overflow:hidden">
+          <button aria-label="Recenter" style="width:44px;height:44px;border:0;background:transparent;font-size:20px;cursor:pointer"><i class="ti ti-current-location"></i></button>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:262px;display:flex;flex-direction:column;background:var(--surface-3);border-top:1px solid var(--border-strong);border-radius:28px 28px 0 0">
+          <div style="display:flex;justify-content:center;padding:8px 0 4px"><span style="width:36px;height:4px;border-radius:999px;background:var(--border-strong)"></span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:4px 16px 8px"><span style="font-weight:600;font-size:16px">{{ donorCount }} donors within {{ radiusLabel }}</span><span style="font-size:12px;color:var(--text-muted)">Updated just now</span></div>
+          <div style="flex:1;overflow:auto">
+            <sc-for list="{{ donorList }}" as="d" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--border)">
+                <span style="position:relative;width:40px;height:40px;flex:none;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">{{ d.ini }}<span style="position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:{{ d.dot }};border:2px solid var(--surface-3)"></span></span>
+                <div style="flex:1;min-width:0"><div style="font-weight:600">{{ d.name }}</div><div style="font-size:12px;color:var(--text-secondary)">{{ d.meta }}</div></div>
+                <span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:12px">{{ d.g }}</span>
+                <button aria-label="Message donor" style="width:44px;height:44px;border-radius:50%;border:1px solid var(--border-strong);background:transparent;font-size:18px;cursor:pointer" style-hover="background:var(--hover)"><i class="ti ti-message-circle"></i></button>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noDonors }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-top:1px solid var(--border)">
+                <div style="font-size:13px;color:var(--text-secondary)">Widen your radius or post a request — we'll alert matching donors as they come online.</div>
+                <button onClick="{{ widen }}" style="height:44px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;cursor:pointer">Search within 5 km</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Filters donors by group and walking radius — tap chips and distances.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · Flat surface-1 map, role-filled circle pins (success available, warning soon, danger request); one sheet plane.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Pins show approximate block, not doorstep — privacy over precision.</div>
+      </div>
+    </div>
+
+    <div id="8" style="width:390px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">08</span><span style="font-weight:600">Request detail · critical</span></div>
+      <div data-screen-label="08 Request critical" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column"><div style="position:absolute;z-index:20;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary);pointer-events:none"></div>
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:52px;display:flex;align-items:center;padding:0 8px">
+          <button aria-label="Back" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-arrow-left"></i></button>
+          <span style="flex:1"></span>
+          <button aria-label="Share" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-share"></i></button>
+          <button aria-label="Report" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-flag"></i></button>
+        </div>
+        <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;padding:0 16px 16px">
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px;border-radius:var(--radius);background:var(--bg-danger);color:var(--text-danger)"><i class="ti ti-alert-triangle" style="font-size:20px"></i><div style="flex:1;font-size:13px"><div style="font-weight:600">Critical · needed by 9:00 pm</div><div>3 h 12 min left</div></div></div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px;padding:0 4px">
+            <div style="display:flex;gap:8px"><span style="display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:14px">O−</span><span style="display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-size:13px">Whole blood · 3 bags</span></div>
+            <h1 style="margin:0;font-size:28px;font-weight:600;line-height:1.08;letter-spacing:-0.03em">Blood for a cardiac surgery patient</h1>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary)"><span style="width:16px;height:16px;border-radius:50%;border:1px solid var(--border-stronger);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-user"></i></span>Posted by Tanvir A. · patient's brother</div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:600">{{ crCommitted }} of 3 donors committed</span><span style="font-size:13px;color:var(--text-secondary)">{{ crLeft }}</span></div>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ crSegs }}" as="s" hint-placeholder-count="3">
+                <span style="flex:1;height:6px;border-radius:999px;background:{{ s.bg }};transition:background var(--dur-base) var(--ease-out)"></span>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="display:flex">
+                <span style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:2px solid var(--surface-1);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">SK</span>
+                <sc-if value="{{ crMine }}" hint-placeholder-val="{{ false }}"><span style="width:32px;height:32px;margin-left:-8px;border-radius:50%;background:var(--bg-accent);color:var(--text-accent);border:2px solid var(--surface-1);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">You</span></sc-if>
+              </div>
+              <span style="font-size:13px;color:var(--text-secondary)">{{ crWho }}</span>
+            </div>
+          </div>
+          <sc-if value="{{ crMine }}" hint-placeholder-val="{{ false }}">
+            <div style="flex-shrink:0;display:flex;gap:10px;padding:12px;border-radius:var(--radius);background:var(--bg-success);color:var(--text-success);font-size:13px"><i class="ti ti-circle-check" style="font-size:18px"></i><span>Commitment sent. Tanvir's been notified and can message you.</span></div>
+          </sc-if>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+            <div style="display:flex;gap:12px;padding:12px 14px"><i class="ti ti-building-hospital" style="font-size:20px;color:var(--text-secondary)"></i><div style="flex:1"><div style="font-weight:600">Dhanmondi General Hospital</div><div style="font-size:13px;color:var(--text-secondary)">Ward 4, 3rd floor · Road 7A</div></div></div>
+            <div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--border)"><i class="ti ti-walk" style="font-size:20px;color:var(--text-secondary)"></i><div style="flex:1"><div style="font-weight:600">1.2 km · 15 min walk</div><div style="font-size:13px;color:var(--text-secondary)">8 min by rickshaw</div></div><a style="font-size:13px;align-self:center">Directions</a></div>
+            <div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--border)"><i class="ti ti-shield-check" style="font-size:20px;color:var(--text-secondary)"></i><div style="flex:1"><div style="font-weight:600">Screened by Roktora</div><div style="font-size:13px;color:var(--text-secondary)">Hospital admission confirmed by phone at 5:40 pm</div></div></div>
+          </div>
+          <div style="flex-shrink:0;font-size:12px;color:var(--text-muted);padding:0 4px">Never pay or accept money for blood. Report anyone who asks.</div>
+        </div>
+        <div style="padding:12px 16px 20px;border-top:1px solid var(--border);background:var(--surface-0);display:flex;gap:8px">
+          <a href="#10" aria-label="Message requester" style="width:52px;height:52px;flex:none;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text-primary);text-decoration:none"><i class="ti ti-message-circle"></i></a>
+          <button onClick="{{ crToggle }}" style="flex:1;height:52px;border-radius:999px;border:{{ crBtnBorder }};background:{{ crBtnBg }};color:{{ crBtnFg }};font-weight:600;font-size:15px;cursor:pointer;transition:background var(--dur-snap) var(--ease-snap)">{{ crBtn }}</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Shows what's needed, by when, and how close — commit or cancel in one tap.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · bg-danger deadline strip, segmented progress per bag, neutral "not verified" badge with screening note.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Patient stays anonymous; donors trust the screening, not a name.</div>
+      </div>
+    </div>
+
+    <div id="9" style="width:390px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">09</span><span style="font-weight:600">Verified hospital request</span></div>
+      <div data-screen-label="09 Hospital request" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column"><div style="position:absolute;z-index:20;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary);pointer-events:none"></div>
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:52px;display:flex;align-items:center;padding:0 8px">
+          <button aria-label="Back" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-arrow-left"></i></button>
+          <span style="flex:1"></span>
+          <button aria-label="Share" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-share"></i></button>
+        </div>
+        <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;padding:0 16px 16px">
+          <div style="flex-shrink:0;display:flex;gap:12px;align-items:center;padding:0 4px">
+            <span style="width:52px;height:52px;flex:none;border-radius:20px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text-secondary)"><i class="ti ti-building-hospital"></i></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;font-size:16px">Mirpur Central Hospital</div>
+              <span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-accent);font-weight:600;font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span>Verified hospital</span>
+            </div>
+          </div>
+          <div style="flex-shrink:0;padding:0 4px;display:flex;flex-direction:column;gap:6px">
+            <h1 style="margin:0;font-size:26px;font-weight:600;line-height:1.08;letter-spacing:-0.03em">Restocking for weekend surgeries</h1>
+            <div style="font-size:13px;color:var(--text-secondary)">Posted by blood bank staff · 40 min ago · Urgent</div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;border:1px solid var(--border);border-left:2px solid var(--border-warning);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+              <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:13px">B−</span>
+              <div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Shortage</span><span style="color:var(--text-secondary)">1 of 4 bags</span></div><div style="height:6px;margin-top:6px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:25%;height:100%;background:var(--progress-fill);border-radius:999px"></div></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border)">
+              <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--bg-warning);color:var(--text-warning);font-weight:600;font-size:13px">O+</span>
+              <div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Low</span><span style="color:var(--text-secondary)">4 of 6 bags</span></div><div style="height:6px;margin-top:6px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:66%;height:100%;background:var(--progress-fill);border-radius:999px"></div></div></div>
+            </div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px">
+            <div style="font-weight:600;padding:0 4px">Pick a time today</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <sc-for list="{{ slots }}" as="t" hint-placeholder-count="6">
+                <button onClick="{{ t.pick }}" disabled="{{ t.full }}" style="height:52px;border-radius:16px;border:{{ t.border }};background:{{ t.bg }};color:{{ t.color }};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2"><span style="font-weight:600;font-size:14px">{{ t.label }}</span><span style="font-size:11px;color:{{ t.sub }}">{{ t.note }}</span></button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+            <div style="display:flex;gap:12px;padding:12px 14px"><i class="ti ti-map-pin" style="font-size:20px;color:var(--text-secondary)"></i><div style="flex:1"><div style="font-weight:600">Blood bank, ground floor</div><div style="font-size:13px;color:var(--text-secondary)">Section 10, Mirpur · 2.1 km</div></div></div>
+            <div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--border)"><i class="ti ti-gift" style="font-size:20px;color:var(--text-secondary)"></i><div style="flex:1;font-size:13px;color:var(--text-secondary)">Free health check and refreshments. Donors get priority if family needs blood later.</div></div>
+          </div>
+        </div>
+        <div style="padding:12px 16px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px">
+          <button style="height:52px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;font-size:15px;cursor:pointer" style-active="opacity:.85">Book {{ slotLabel }}</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Hospital-posted need across groups, booked into a time slot.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · VerifiedBadge (same shape as admin side), stock pills by role, warning stripe for urgent.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Slots add a step vs. walk-in, but prevent crowding at the bank.</div>
+      </div>
+    </div>
+
+    <div id="10" style="width:390px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">10</span><span style="font-weight:600">Chat with context ribbon</span></div>
+      <div data-screen-label="10 Chat" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column"><div style="position:absolute;z-index:20;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary);pointer-events:none"></div>
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:60px;display:flex;align-items:center;gap:8px;padding:0 8px;border-bottom:1px solid var(--border)">
+          <button aria-label="Back" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-arrow-left"></i></button>
+          <span style="width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">TA</span>
+          <div style="flex:1"><div style="font-weight:600">Tanvir A.</div><div style="font-size:12px;color:var(--text-success)">Online</div></div>
+          <button aria-label="More" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px" style-hover="background:var(--hover)"><i class="ti ti-dots-vertical"></i></button>
+        </div>
+        <a href="#8" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);color:var(--text-primary);text-decoration:none;border-left:2px solid var(--border-danger)">
+          <span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:12px">O−</span>
+          <span style="flex:1;font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Dhanmondi General · Ward 4 · by 9 pm</span>
+          <span style="font-size:12px;color:var(--text-secondary)">2 of 3</span>
+          <i class="ti ti-chevron-right" style="color:var(--text-muted)"></i>
+        </a>
+        <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:16px">
+          <div style="flex-shrink:0;align-self:center;font-size:12px;color:var(--text-muted);padding:4px 10px;border-radius:999px;background:var(--surface-2)">Phone numbers stay hidden unless you share them</div>
+          <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="4">
+            <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:{{ m.align }};gap:2px">
+              <div style="max-width:78%;padding:10px 12px;border-radius:20px;background:{{ m.bg }};color:{{ m.fg }};border:{{ m.border }};font-size:14px;text-wrap:pretty">{{ m.text }}</div>
+              <span style="font-size:11px;color:var(--text-muted);padding:0 4px">{{ m.time }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none">
+          <sc-for list="{{ quick }}" as="q" hint-placeholder-count="3">
+            <button onClick="{{ q.send }}" style="flex:none;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-1);font-size:13px;cursor:pointer" style-hover="background:var(--surface-2)">{{ q.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;padding:10px 16px 20px;border-top:1px solid var(--border)">
+          <button aria-label="Share location" style="width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--border-strong);background:transparent;font-size:18px;cursor:pointer"><i class="ti ti-map-pin-share"></i></button>
+          <input value="{{ draft }}" onChange="{{ setDraft }}" onKeyDown="{{ onKey }}" placeholder="Write a message" style="flex:1;min-width:0;height:44px;border-radius:var(--radius);border:1px solid var(--border-stronger);background:var(--surface-1);padding:0 12px;outline:none">
+          <button onClick="{{ sendDraft }}" aria-label="Send" style="width:44px;height:44px;flex:none;border:0;border-radius:50%;background:var(--fill-brand);color:var(--on-fill);font-size:18px;cursor:pointer"><i class="ti ti-send"></i></button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Coordinates arrival without exposing numbers; quick replies for walking donors.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · Context ribbon reuses UrgencyRow (danger stripe + pill); accent only on send.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · No voice notes in v1 — lighter on data, harder for low-literacy users.</div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: localStorage.getItem('ld-theme') || 'light', avail: true, group: 'O−', radius: 3, committed: false, slot: 1, draft: '',
+    msgs: [
+      { me: false, text: "Thank you for committing. He's in surgery prep now.", time: '6:02 pm' },
+      { me: true, text: "I'm leaving in 10 minutes. Which gate should I use?", time: '6:04 pm' },
+      { me: false, text: 'Main gate on Road 7A, then ward 4 on the third floor. Ask for Dr. Sultana.', time: '6:05 pm' }
+    ] };
+  renderVals() {
+    const s = this.state;
+    const roleFill = { avail: 'var(--fill-success)', soon: 'var(--fill-warning)', req: 'var(--fill-danger)' };
+    const donors = [
+      { ini: 'FH', name: 'Farhan H.', g: 'O−', d: 0.6, st: 'avail', x: 230, y: 300, n: 7 },
+      { ini: 'SK', name: 'Sadia K.', g: 'O−', d: 0.9, st: 'avail', x: 90, y: 380, n: 3 },
+      { ini: 'RM', name: 'Rafiq M.', g: 'O−', d: 2.4, st: 'soon', x: 320, y: 220, n: 12 },
+      { ini: 'AI', name: 'Ayesha I.', g: 'A+', d: 0.8, st: 'avail', x: 140, y: 470, n: 2 },
+      { ini: 'MR', name: 'Mahmud R.', g: 'B+', d: 1.5, st: 'avail', x: 300, y: 440, n: 5 },
+      { ini: 'TS', name: 'Tania S.', g: 'O+', d: 2.8, st: 'avail', x: 60, y: 280, n: 9 },
+      { ini: 'JH', name: 'Jamal H.', g: 'AB+', d: 4.2, st: 'soon', x: 350, y: 360, n: 1 },
+      { ini: 'NB', name: 'Nadia B.', g: 'B−', d: 4.6, st: 'avail', x: 40, y: 520, n: 4 }
+    ];
+    const vis = donors.filter(d => (s.group === 'All' || d.g === s.group) && d.d <= s.radius);
+    const send = t => { if (!t.trim()) return; this.setState({ draft: '', msgs: [...s.msgs, { me: true, text: t, time: 'Now' }] }); };
+    const committed = s.committed ? 2 : 1;
+    const slots = [['4:00', '2 left'], ['4:30', '1 left'], ['5:00', 'Full'], ['5:30', '3 left'], ['6:00', '4 left'], ['6:30', '4 left']];
+    return {
+      theme: s.theme, themeLabel: s.theme === 'dark' ? 'Light' : 'Dark', themeIcon: s.theme === 'dark' ? 'ti-sun' : 'ti-moon',
+      toggleTheme: () => { const t = s.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('ld-theme', t); this.setState({ theme: t }); },
+      toggleAvail: () => this.setState({ avail: !s.avail }),
+      availTrack: s.avail ? 'var(--fill-success)' : 'var(--border-strong)', availJustify: s.avail ? 'flex-end' : 'flex-start',
+      chips: ['All', 'O−', 'O+', 'A+', 'A−', 'B+', 'B−', 'AB+', 'AB−'].map(g => { const on = g === s.group; return { label: g, pick: () => this.setState({ group: g }), border: on ? '1.5px solid var(--fill-brand)' : '1px solid var(--border-strong)', bg: on ? 'var(--bg-brand)' : 'var(--surface-1)', color: on ? 'var(--text-brand)' : 'var(--text-primary)' }; }),
+      radii: [1, 3, 5].map(r => ({ label: r + ' km', pick: () => this.setState({ radius: r }), bg: r === s.radius ? 'var(--fill-primary)' : 'transparent', color: r === s.radius ? 'var(--on-primary)' : 'var(--text-primary)' })),
+      pins: [...vis.map(d => ({ x: d.x, y: d.y, g: d.g, fill: roleFill[d.st] })), { x: 200, y: 360, g: '', fill: roleFill.req }],
+      donorCount: vis.length, radiusLabel: s.radius + ' km', noDonors: vis.length === 0,
+      widen: () => this.setState({ radius: 5 }),
+      donorList: vis.sort((a, b) => a.d - b.d).map(d => ({ ini: d.ini, name: d.name, g: d.g, dot: roleFill[d.st], meta: `${d.d < 1 ? d.d * 1000 + ' m' : d.d + ' km'} · ${d.st === 'avail' ? 'Available' : 'Eligible in 6 days'} · ${d.n} donations` })),
+      crCommitted: committed, crMine: s.committed, crLeft: `${3 - committed} more needed`,
+      crSegs: [0, 1, 2].map(i => ({ bg: i < committed ? 'var(--fill-brand)' : 'var(--progress-track)' })),
+      crWho: s.committed ? 'Sadia K. and you' : 'Sadia K. is on the way',
+      crToggle: () => this.setState({ committed: !s.committed }),
+      crBtn: s.committed ? 'Cancel commitment' : 'Commit to donate',
+      crBtnBg: s.committed ? 'transparent' : 'var(--fill-brand)', crBtnFg: s.committed ? 'var(--text-danger)' : 'var(--on-fill)',
+      crBtnBorder: s.committed ? '1px solid var(--border-danger)' : '0',
+      slots: slots.map(([l, n], i) => { const full = n === 'Full'; const on = i === s.slot; return { label: l + ' pm', note: n, full, pick: () => this.setState({ slot: i }), border: on ? '1.5px solid var(--fill-brand)' : '1px solid var(--border-strong)', bg: full ? 'var(--surface-2)' : on ? 'var(--bg-brand)' : 'var(--surface-1)', color: full ? 'var(--text-disabled)' : on ? 'var(--text-brand)' : 'var(--text-primary)', sub: full ? 'var(--text-disabled)' : 'var(--text-muted)' }; }),
+      slotLabel: slots[s.slot][0] + ' pm',
+      msgs: s.msgs.map(m => ({ text: m.text, time: m.time, align: m.me ? 'flex-end' : 'flex-start', bg: m.me ? 'var(--fill-brand)' : 'var(--surface-1)', fg: m.me ? 'var(--on-fill)' : 'var(--text-primary)', border: m.me ? '0' : '1px solid var(--border)' })),
+      quick: ["I'm on my way", 'Running 10 min late', "I've arrived"].map(q => ({ label: q, send: () => send(q) })),
+      draft: s.draft, setDraft: e => this.setState({ draft: e.target.value }),
+      onKey: e => { if (e.key === 'Enter') send(s.draft); }, sendDraft: () => send(s.draft)
+    };
+  }
+}
+</script>
+</body>
+</html>

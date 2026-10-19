@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root,[data-theme=light]{color-scheme:light;--surface-0:#f3f2ef;--surface-1:#ffffff;--surface-2:#eae8e3;--surface-3:#ffffff;--text-primary:#141413;--text-secondary:#55534d;--text-muted:#76736c;--text-disabled:#b3b0a8;--text-accent:#1d5fbf;--text-danger:#b3261e;--text-success:#1b6b3c;--text-warning:#7f4c00;--text-brand:#b01a30;--border:rgba(20,20,19,.1);--border-strong:rgba(20,20,19,.2);--border-stronger:rgba(20,20,19,.4);--border-accent:#2f6fd1;--border-danger:#c8321f;--border-success:#2b8a4b;--border-warning:#c98a12;--fill-primary:#141413;--fill-accent:#2f6fd1;--fill-danger:#c8321f;--fill-success:#22995a;--fill-warning:#b97c0c;--fill-brand:#d42a40;--on-fill:#ffffff;--on-primary:#f7f6f3;--bg-accent:#e6eefb;--bg-danger:#fce9e6;--bg-success:#e2f3e8;--bg-warning:#fcf0d8;--bg-brand:#fde8ea;--progress-track:rgba(20,20,19,.08);--progress-fill:#d42a40;--hover:rgba(20,20,19,.04);--press:rgba(20,20,19,.08);--shadow-1:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);--shadow-2:0 2px 6px rgba(20,20,19,.06),0 18px 40px -12px rgba(20,20,19,.18);--glass:rgba(243,242,239,.78);--scrim:rgba(29,28,26,.32)}
+[data-theme=dark]{color-scheme:dark;--surface-0:#121211;--surface-1:#1d1c1b;--surface-2:#282725;--surface-3:#323130;--text-primary:#f4f2ec;--text-secondary:#c2bfb7;--text-muted:#9a978f;--text-disabled:#5f5d58;--text-accent:#8fb5f3;--text-danger:#f2a093;--text-success:#8dd3a5;--text-warning:#ecc679;--text-brand:#ff9aa7;--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.18);--border-stronger:rgba(255,255,255,.36);--border-accent:#5b92e6;--border-danger:#e0614e;--border-success:#4aa86a;--border-warning:#d69b2a;--fill-primary:#f4f2ec;--fill-accent:#3d7ddb;--fill-danger:#cf4632;--fill-success:#2f9f5f;--fill-warning:#b57f14;--fill-brand:#e5384e;--on-fill:#ffffff;--on-primary:#121211;--bg-accent:#1b2740;--bg-danger:#3a1f1b;--bg-success:#18301f;--bg-warning:#382c15;--bg-brand:#3b171d;--progress-track:rgba(255,255,255,.1);--progress-fill:#e5384e;--hover:rgba(255,255,255,.05);--press:rgba(255,255,255,.1);--shadow-1:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--shadow-2:0 2px 6px rgba(0,0,0,.3),0 18px 40px -12px rgba(0,0,0,.6);--glass:rgba(18,18,17,.75);--scrim:rgba(0,0,0,.5)}
+:root{--radius:14px;--radius-card:24px;--font-sans:"Instrument Sans","Hind Siliguri",system-ui,sans-serif;--font-voice:"Source Serif 4",Georgia,serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--dur-fast:90ms;--dur-snap:140ms;--dur-base:220ms;--dur-slow:360ms;--ease-out:cubic-bezier(.2,.7,.2,1);--ease-snap:cubic-bezier(.3,0,.2,1);--ease-overshoot:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box}body{margin:0;font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+a{color:var(--text-accent);text-decoration:none;font-weight:600}a:hover{text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--border-accent);outline-offset:2px}
+input::placeholder,textarea::placeholder{color:var(--text-muted)}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100vh;background:var(--surface-0);color:var(--text-primary);font-family:var(--font-sans);font-size:14px;line-height:1.5">
+
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="17 Login and 2FA" style="min-height:100vh;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:12px;padding:16px 24px">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;flex:1"><svg viewBox="520 440 702 1040" style="height:26px;width:auto;flex:none;display:block" aria-hidden="true"><path style="fill:var(--fill-brand)" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>Roktora for hospitals</div>
+        <button onClick="{{ toggleTheme }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-1);cursor:pointer"><i class="ti ti-moon"></i>{{ themeLabel }}</button>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+        <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px;padding:32px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+          <sc-if value="{{ lgPw }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:22px;font-weight:600">Log in to your blood bank</h1><p style="margin:0;color:var(--text-secondary);font-size:13px">For verified hospital staff only. Every session is logged.</p></div>
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Work email</span><input value="sultana@mirpurcentral.org.bd" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="display:flex;justify-content:space-between;font-size:13px;font-weight:600">Password<a style="font-weight:400">Forgot password</a></span><input type="password" value="hunter2hunter2" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+              <button onClick="{{ toTwoFa }}" style="height:44px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Log in</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ lg2fa }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="width:44px;height:44px;border-radius:50%;background:var(--bg-accent);color:var(--text-accent);display:flex;align-items:center;justify-content:center;font-size:22px"><i class="ti ti-shield-lock"></i></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:22px;font-weight:600">Two-step verification</h1><p style="margin:0;color:var(--text-secondary);font-size:13px">Enter the 6-digit code from your authenticator app.</p></div>
+              <input value="{{ tfa }}" onChange="{{ setTfa }}" maxLength="6" inputMode="numeric" placeholder="······" style="height:56px;border:{{ tfaBorder }};border-radius:var(--radius);background:var(--surface-1);padding:0 16px;font-family:var(--font-mono);font-size:24px;letter-spacing:0.5em;outline:none">
+              <sc-if value="{{ tfaErr }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;padding:10px 12px;border-radius:var(--radius);background:var(--bg-danger);color:var(--text-danger);font-size:13px"><i class="ti ti-alert-circle" style="font-size:16px;margin-top:2px"></i>That code didn't match. Check your app's clock, then try again.</div></sc-if>
+              <button onClick="{{ toggleTrust }}" style="display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:0;cursor:pointer;text-align:left"><span style="width:20px;height:20px;border-radius:6px;border:{{ trustBorder }};background:{{ trustBg }};color:var(--on-fill);display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-check" style="opacity:{{ trustOp }}"></i></span><span style="font-size:13px">Trust this device for 30 days</span></button>
+              <button onClick="{{ verify2fa }}" style="height:44px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Verify</button>
+              <button onClick="{{ backToPw }}" style="height:36px;border:0;background:transparent;color:var(--text-secondary);cursor:pointer;border-radius:999px">Use a backup code instead</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:640px;margin:0 auto 32px;padding:0 24px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary)">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">17 · Login and 2FA · type 6 digits to continue</div>
+          <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Gates admin access behind password plus authenticator code.</div>
+          <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · A single in-flow card, one accent per step, bg-danger inline error with a fix.</div>
+          <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · No SMS fallback — stronger against SIM swaps, harder for staff without smartphones.</div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh;display:flex;flex-wrap:wrap;align-items:stretch">
+      <aside style="flex:1 1 232px;max-width:100%;display:flex;flex-direction:column;gap:16px;padding:16px 12px;border-right:1px solid var(--border);background:var(--surface-0)">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:4px 8px"><svg viewBox="520 440 702 1040" style="height:26px;width:auto;flex:none;display:block" aria-hidden="true"><path style="fill:var(--fill-brand)" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>Roktora</div>
+        <nav style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:2px">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="7">
+            <button onClick="{{ n.go }}" style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:0;border-radius:999px;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }};cursor:pointer;text-align:left;transition:background var(--dur-snap) var(--ease-snap)" style-hover="background:var(--surface-2)">
+              <i class="ti {{ n.icon }}" style="font-size:18px"></i><span style="flex:1">{{ n.label }}</span><span style="font-size:12px;color:{{ n.badgeColor }}">{{ n.badge }}</span>
+            </button>
+          </sc-for>
+        </nav>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:20px;border:1px solid var(--border);background:var(--surface-1)">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px">Mirpur Central Hospital<span style="width:16px;height:16px;flex:none;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:28px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">DS</span><div style="flex:1;font-size:12px;line-height:1.3"><div>Dr. Sultana</div><div style="color:var(--text-muted)">Blood bank lead</div></div><button onClick="{{ logout }}" aria-label="Log out" style="width:32px;height:32px;border:0;border-radius:50%;background:transparent;cursor:pointer;font-size:16px;color:var(--text-secondary)" style-hover="background:var(--hover)"><i class="ti ti-logout"></i></button></div>
+        </div>
+      </aside>
+
+      <main style="flex:999 1 640px;min-width:0;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--border)">
+          <div style="flex:1;min-width:200px"><div style="font-size:24px;font-weight:600;letter-spacing:-0.03em">{{ pageTitle }}</div><div style="font-size:13px;color:var(--text-secondary)">{{ pageSub }}</div></div>
+          <div style="height:36px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-1);color:var(--text-muted);min-width:200px"><i class="ti ti-search"></i><span style="font-size:13px">Search donors, bags, requests</span></div>
+          <button onClick="{{ toggleTheme }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-1);cursor:pointer" style-hover="background:var(--surface-2)"><i class="ti ti-moon"></i>{{ themeLabel }}</button>
+        </div>
+
+        <div style="flex:1;padding:24px;display:flex;flex-direction:column;gap:20px">
+
+          <sc-if value="{{ sDash }}" hint-placeholder-val="{{ true }}">
+            <div data-screen-label="18 Dashboard" style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+                <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+                  <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                    <span style="font-size:13px;color:var(--text-secondary)">{{ s.label }}</span>
+                    <span style="font-size:40px;font-weight:600;letter-spacing:-0.04em;line-height:1.1;font-variant-numeric:tabular-nums">{{ s.value }}</span>
+                    <span style="font-size:12px;color:{{ s.subColor }}">{{ s.sub }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:start">
+                <div style="display:flex;flex-direction:column;gap:20px">
+                  <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-weight:600;flex:1">Inventory</span><button onClick="{{ goInv }}" style="height:32px;padding:0 10px;border:0;border-radius:var(--radius);background:transparent;color:var(--text-accent);cursor:pointer" style-hover="background:var(--hover)">Full view</button></div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">
+                      <sc-for list="{{ inv }}" as="i" hint-placeholder-count="8">
+                        <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 -0.5px -0.5px 0">
+                          <div style="display:flex;align-items:center;justify-content:space-between"><span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:{{ i.bg }};color:{{ i.fg }};font-weight:600;font-size:12px">{{ i.g }}</span><span style="font-size:12px;color:{{ i.fg }}">{{ i.status }}</span></div>
+                          <span style="font-size:22px;font-weight:600;font-variant-numeric:tabular-nums">{{ i.units }} <span style="font-size:12px;font-weight:400;color:var(--text-muted)">of {{ i.target }}</span></span>
+                          <div style="height:4px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:{{ i.pct }}%;height:100%;background:{{ i.bar }};border-radius:999px"></div></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-weight:600;flex:1">Open requests</span><button onClick="{{ goReq }}" style="height:32px;padding:0 10px;border:0;border-radius:var(--radius);background:transparent;color:var(--text-accent);cursor:pointer" style-hover="background:var(--hover)">See all</button></div>
+                    <sc-for list="{{ reqRows }}" as="r" hint-placeholder-count="4">
+                      <button onClick="{{ r.open }}" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:0;border-left:{{ r.stripe }};border-top:{{ r.top }};background:transparent;text-align:left;cursor:pointer;width:100%" style-hover="background:var(--hover)">
+                        <span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:{{ r.pbg }};color:{{ r.pfg }};font-weight:600;font-size:12px">{{ r.g }}</span>
+                        <div style="flex:1;min-width:0"><div style="font-weight:600">{{ r.title }}</div><div style="font-size:12px;color:var(--text-secondary)">{{ r.meta }}</div></div>
+                        <div style="width:120px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--text-secondary);text-align:right">{{ r.prog }}</span><div style="height:4px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:{{ r.pct }}%;height:100%;background:var(--progress-fill)"></div></div></div>
+                        <span style="width:64px;text-align:right;font-size:12px;font-weight:600;color:{{ r.urgColor }}">{{ r.urg }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:20px">
+                  <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-weight:600;flex:1">Check-in today</span><button onClick="{{ goCheckin }}" style="height:32px;padding:0 10px;border-radius:var(--radius);border:1px solid var(--border-strong);background:transparent;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:var(--hover)"><i class="ti ti-scan"></i>Scan QR</button></div>
+                    <sc-for list="{{ queue }}" as="q" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:{{ q.top }}">
+                        <span style="width:32px;height:32px;flex:none;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">{{ q.ini }}</span>
+                        <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">{{ q.name }}</div><div style="font-size:12px;color:var(--text-secondary)">{{ q.meta }}</div></div>
+                        <span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:{{ q.sbg }};color:{{ q.sfg }};font-size:12px;font-weight:600">{{ q.status }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:14px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                    <span style="font-weight:600">Quick post</span>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+                      <sc-for list="{{ qpGroups }}" as="g" hint-placeholder-count="8">
+                        <button onClick="{{ g.pick }}" style="height:40px;border-radius:999px;border:{{ g.border }};background:{{ g.bg }};color:{{ g.color }};font-weight:600;cursor:pointer">{{ g.label }}</button>
+                      </sc-for>
+                    </div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                      <div style="display:flex;align-items:center;border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden">
+                        <button onClick="{{ qpMinus }}" aria-label="Fewer bags" style="width:40px;height:40px;border:0;background:transparent;cursor:pointer"><i class="ti ti-minus"></i></button>
+                        <span style="min-width:64px;text-align:center;font-variant-numeric:tabular-nums">{{ qpUnits }} bags</span>
+                        <button onClick="{{ qpPlus }}" aria-label="More bags" style="width:40px;height:40px;border:0;background:transparent;cursor:pointer"><i class="ti ti-plus"></i></button>
+                      </div>
+                      <div style="display:flex;border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;flex:1">
+                        <sc-for list="{{ qpUrg }}" as="u" hint-placeholder-count="3">
+                          <button onClick="{{ u.pick }}" style="flex:1;height:40px;border:0;border-left:{{ u.left }};background:{{ u.bg }};color:{{ u.color }};font-size:13px;cursor:pointer">{{ u.label }}</button>
+                        </sc-for>
+                      </div>
+                    </div>
+                    <sc-if value="{{ qpPosted }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;padding:10px 12px;border-radius:var(--radius);background:var(--bg-success);color:var(--text-success);font-size:13px"><i class="ti ti-circle-check" style="font-size:16px;margin-top:2px"></i>{{ qpPostedText }}</div></sc-if>
+                    <button onClick="{{ qpPost }}" style="height:44px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Post request</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sInv }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="19 Inventory" style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                <div style="display:flex;border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;background:var(--surface-1)">
+                  <sc-for list="{{ compTabs }}" as="c" hint-placeholder-count="5">
+                    <button onClick="{{ c.pick }}" style="height:36px;padding:0 14px;border:0;border-left:{{ c.left }};background:{{ c.bg }};color:{{ c.color }};font-size:13px;cursor:pointer">{{ c.label }}</button>
+                  </sc-for>
+                </div>
+                <span style="flex:1"></span>
+                <button style="height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:var(--hover)"><i class="ti ti-download"></i>Export CSV</button>
+                <button style="height:36px;padding:0 14px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer"><i class="ti ti-plus"></i>Log new bags</button>
+              </div>
+              <div style="border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow-x:auto;scrollbar-width:none">
+                <div style="min-width:640px;display:grid;grid-template-columns:120px repeat(4,1fr) 140px">
+                  <div style="padding:10px 16px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-strong)">Group</div>
+                  <sc-for list="{{ compHeads }}" as="h" hint-placeholder-count="4"><div style="padding:10px 16px;font-size:12px;color:{{ h.color }};border-bottom:1px solid var(--border-strong);background:{{ h.bg }}">{{ h.label }}</div></sc-for>
+                  <div style="padding:10px 16px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-strong)">Status</div>
+                  <sc-for list="{{ invTable }}" as="r" hint-placeholder-count="8">
+                    <div style="padding:10px 16px;border-top:{{ r.top }}"><span style="display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:{{ r.bg }};color:{{ r.fg }};font-weight:600;font-size:12px">{{ r.g }}</span></div>
+                    <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4"><div style="padding:10px 16px;border-top:{{ r.top }};font-variant-numeric:tabular-nums;background:{{ c.bg }};color:{{ c.color }}">{{ c.v }}</div></sc-for>
+                    <div style="padding:10px 16px;border-top:{{ r.top }};font-size:13px;color:{{ r.fg }}">{{ r.status }}</div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-weight:600;flex:1">Expiring soon</span><span style="font-size:12px;color:var(--text-secondary)">{{ expCount }} bags in the next 7 days</span></div>
+                <div style="overflow-x:auto;scrollbar-width:none">
+                  <sc-for list="{{ batches }}" as="b" hint-placeholder-count="6">
+                    <div style="min-width:640px;display:grid;grid-template-columns:170px 70px 1fr 110px 1.3fr 120px;align-items:center;gap:12px;padding:10px 16px;border-top:{{ b.top }};border-left:{{ b.stripe }}">
+                      <span style="font-family:var(--font-mono);font-size:12px">{{ b.id }}</span>
+                      <span style="display:inline-flex;align-items:center;justify-self:start;height:22px;padding:0 8px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:12px">{{ b.g }}</span>
+                      <span style="font-size:13px">{{ b.comp }}</span>
+                      <span style="font-size:13px;color:var(--text-secondary)">{{ b.exp }}</span>
+                      <div style="height:4px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:{{ b.pct }}%;height:100%;background:{{ b.bar }}"></div></div>
+                      <span style="font-size:13px;font-weight:600;color:{{ b.color }};text-align:right">{{ b.left }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sReq }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="20 Requests" style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                <sc-for list="{{ reqRows }}" as="r" hint-placeholder-count="4">
+                  <button onClick="{{ r.open }}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:0;border-left:{{ r.stripe }};border-top:{{ r.top }};background:{{ r.selBg }};text-align:left;cursor:pointer;width:100%" style-hover="background:var(--hover)">
+                    <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:{{ r.pbg }};color:{{ r.pfg }};font-weight:600;font-size:13px">{{ r.g }}</span>
+                    <div style="flex:1;min-width:0"><div style="font-weight:600">{{ r.title }}</div><div style="font-size:12px;color:var(--text-secondary)">{{ r.meta }}</div></div>
+                    <div style="width:160px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--text-secondary)">{{ r.prog }}</span><div style="height:4px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:{{ r.pct }}%;height:100%;background:var(--progress-fill)"></div></div></div>
+                    <span style="width:72px;text-align:right;font-size:13px;font-weight:600;color:{{ r.urgColor }}">{{ r.urg }}</span>
+                    <i class="ti ti-chevron-right" style="color:var(--text-muted)"></i>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="font-size:13px;color:var(--text-secondary)">Select a request to open its detail drawer.</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sCheck }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="21 Check-in" style="display:flex;flex-direction:column;gap:20px;max-width:880px">
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ ciBars }}" as="b" hint-placeholder-count="3">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="height:4px;border-radius:999px;background:{{ b.bg }};transition:background var(--dur-base) var(--ease-out)"></span><span style="font-size:13px;color:{{ b.color }}">{{ b.label }}</span></div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ ci1 }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-wrap:wrap;gap:20px">
+                  <div style="flex:1 1 320px;aspect-ratio:4/3;max-height:380px;position:relative;border-radius:20px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
+                    <div style="position:relative;width:200px;height:200px">
+                      <span style="position:absolute;left:0;top:0;width:32px;height:32px;border-left:2px solid var(--border-accent);border-top:2px solid var(--border-accent)"></span>
+                      <span style="position:absolute;right:0;top:0;width:32px;height:32px;border-right:2px solid var(--border-accent);border-top:2px solid var(--border-accent)"></span>
+                      <span style="position:absolute;left:0;bottom:0;width:32px;height:32px;border-left:2px solid var(--border-accent);border-bottom:2px solid var(--border-accent)"></span>
+                      <span style="position:absolute;right:0;bottom:0;width:32px;height:32px;border-right:2px solid var(--border-accent);border-bottom:2px solid var(--border-accent)"></span>
+                    </div>
+                    <span style="position:absolute;left:16px;bottom:12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">camera feed</span>
+                  </div>
+                  <div style="flex:1 1 280px;display:flex;flex-direction:column;gap:16px">
+                    <div><div style="font-weight:600;font-size:16px">Scan the donor's passport</div><div style="font-size:13px;color:var(--text-secondary)">Point the desk camera at the QR on their phone. Works offline; syncs later.</div></div>
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Or enter the code</span><input placeholder="LD-0000-0000" value="LD-7K4Q-2931" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;font-family:var(--font-mono);outline:none"></label>
+                    <button onClick="{{ ciNext }}" style="height:44px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Look up donor</button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ ci2 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:start">
+                  <div style="flex:1 1 300px;display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:var(--surface-2);border:1px solid var(--border)">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <span style="width:48px;height:48px;border-radius:50%;background:var(--surface-1);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:600">NR</span>
+                      <div style="flex:1"><div style="font-weight:600;font-size:16px">Nusrat Rahman</div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">LD-7K4Q-2931</div></div>
+                      <span style="display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600">O−</span>
+                    </div>
+                    <span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-accent);font-weight:600;font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span>Group verified · Dhanmondi General</span>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+                      <div><div style="color:var(--text-muted)">Booked slot</div><div>Today 4:30 pm</div></div>
+                      <div><div style="color:var(--text-muted)">Last donation</div><div>14 Jun · 127 days</div></div>
+                      <div><div style="color:var(--text-muted)">Pre-check</div><div style="color:var(--text-success)">Eligible</div></div>
+                      <div><div style="color:var(--text-muted)">For request</div><div>B− restock</div></div>
+                    </div>
+                  </div>
+                  <div style="flex:1 1 300px;display:flex;flex-direction:column;gap:14px">
+                    <div style="font-weight:600">Confirm at the desk</div>
+                    <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                      <sc-for list="{{ ciChecks }}" as="c" hint-placeholder-count="3">
+                        <button onClick="{{ c.toggle }}" style="display:flex;gap:12px;align-items:center;padding:12px 14px;border:0;border-top:{{ c.top }};background:transparent;text-align:left;cursor:pointer;width:100%" style-hover="background:var(--hover)">
+                          <span style="width:20px;height:20px;flex:none;border-radius:6px;border:{{ c.border }};background:{{ c.bg }};color:var(--on-fill);display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-check" style="opacity:{{ c.op }}"></i></span><span style="font-size:13px">{{ c.label }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Hemoglobin (g/dL)</span><input value="13.4" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none;font-variant-numeric:tabular-nums"></label>
+                    <div style="display:flex;gap:8px"><button onClick="{{ ciBack }}" style="height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;cursor:pointer">Back</button><button onClick="{{ ciNext }}" disabled="{{ ciBlocked }}" style="flex:1;height:44px;border:0;border-radius:999px;background:{{ ciBtnBg }};color:{{ ciBtnFg }};font-weight:600;cursor:pointer">Confirm donor</button></div>
+                    <button style="height:36px;border:0;background:transparent;color:var(--text-danger);cursor:pointer;border-radius:999px" style-hover="background:var(--bg-danger)">Defer donor</button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ ci3 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <div><div style="font-weight:600;font-size:16px">Assign a bay</div><div style="font-size:13px;color:var(--text-secondary)">Nusrat R. · O− · whole blood, about 25 minutes</div></div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+                    <sc-for list="{{ bays }}" as="b" hint-placeholder-count="6">
+                      <button onClick="{{ b.pick }}" disabled="{{ b.busy }}" style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:14px;border-radius:20px;border:{{ b.border }};background:{{ b.bg }};cursor:pointer;text-align:left">
+                        <span style="font-weight:600;color:{{ b.color }}">Bay {{ b.n }}</span>
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:{{ b.sColor }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ b.dot }}"></span>{{ b.status }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:8px"><button onClick="{{ ciBack }}" style="height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;cursor:pointer">Back</button><button onClick="{{ ciNext }}" style="height:44px;padding:0 20px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Assign bay {{ bayN }}</button></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ ci4 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:var(--bg-success);color:var(--text-success)">
+                  <div style="display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px"><i class="ti ti-circle-check" style="font-size:22px"></i>Nusrat R. checked in to bay {{ bayN }}</div>
+                  <div style="font-size:13px">The donor's app now shows "Donating". The bag ID is assigned when collection starts.</div>
+                  <button onClick="{{ ciReset }}" style="align-self:flex-start;height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--border-success);background:transparent;color:var(--text-success);cursor:pointer">Check in the next donor</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sDonors }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="22 Donor directory" style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <sc-for list="{{ dChips }}" as="c" hint-placeholder-count="9">
+                  <button onClick="{{ c.pick }}" style="height:32px;padding:0 12px;border-radius:999px;border:{{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button>
+                </sc-for>
+                <span style="flex:1"></span>
+                <button onClick="{{ toggleElig }}" style="height:32px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border-strong);background:{{ eligBg }};color:{{ eligFg }};font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-filter"></i>Eligible now only</button>
+              </div>
+              <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;border-radius:var(--radius);background:var(--bg-accent);color:var(--text-accent)">
+                  <span style="font-weight:600;flex:1">{{ selCount }} selected</span>
+                  <button onClick="{{ clearSel }}" style="height:36px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--text-accent);cursor:pointer">Clear</button>
+                  <button onClick="{{ openCompose }}" style="height:36px;padding:0 14px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer"><i class="ti ti-send"></i>Message {{ selCount }}</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ composeOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--border-strong);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                  <div style="display:flex;align-items:center"><span style="font-weight:600;flex:1">Message {{ selCount }} donors</span><button onClick="{{ closeCompose }}" aria-label="Close" style="width:32px;height:32px;border:0;border-radius:50%;background:transparent;cursor:pointer"><i class="ti ti-x"></i></button></div>
+                  <textarea style="min-height:90px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:10px 12px;resize:vertical;outline:none">B− stock is low at Mirpur Central. If you're free this week, book a slot in the app — it takes about 40 minutes.</textarea>
+                  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:12px;color:var(--text-muted);flex:1">Sent as an in-app notification. Donor phone numbers stay hidden.</span><button onClick="{{ sendBulk }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--fill-primary);color:var(--on-primary);font-weight:600;cursor:pointer">Send message</button></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ bulkSent }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;padding:10px 12px;border-radius:var(--radius);background:var(--bg-success);color:var(--text-success);font-size:13px"><i class="ti ti-circle-check" style="font-size:16px;margin-top:2px"></i>Message sent to {{ bulkSentN }} donors.</div></sc-if>
+              <div style="border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow-x:auto;scrollbar-width:none">
+                <div style="min-width:720px">
+                  <div style="display:grid;grid-template-columns:44px 1.6fr 70px 1fr 1fr 1fr 90px;gap:12px;align-items:center;padding:10px 16px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-strong)"><span></span><span>Donor</span><span>Group</span><span>Area</span><span>Last donation</span><span>Status</span><span style="text-align:right">Donations</span></div>
+                  <sc-for list="{{ dRows }}" as="d" hint-placeholder-count="8">
+                    <div style="display:grid;grid-template-columns:44px 1.6fr 70px 1fr 1fr 1fr 90px;gap:12px;align-items:center;padding:10px 16px;border-top:{{ d.top }};background:{{ d.rowBg }}">
+                      <button onClick="{{ d.toggle }}" aria-label="Select donor" style="width:20px;height:20px;border-radius:6px;border:{{ d.cbBorder }};background:{{ d.cbBg }};color:var(--on-fill);padding:0;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer"><i class="ti ti-check" style="opacity:{{ d.op }}"></i></button>
+                      <div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="position:relative;width:32px;height:32px;flex:none;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">{{ d.ini }}<span style="position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:{{ d.dot }};border:2px solid var(--surface-1)"></span></span><span style="font-weight:600">{{ d.name }}</span></div>
+                      <span style="display:inline-flex;align-items:center;justify-self:start;height:22px;padding:0 8px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:12px">{{ d.g }}</span>
+                      <span style="font-size:13px;color:var(--text-secondary)">{{ d.area }}</span>
+                      <span style="font-size:13px;color:var(--text-secondary)">{{ d.last }}</span>
+                      <span style="font-size:13px;color:{{ d.sColor }}">{{ d.status }}</span>
+                      <span style="text-align:right;font-variant-numeric:tabular-nums">{{ d.n }}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ dEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:24px 16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;border-top:1px solid var(--border)"><span style="color:var(--text-secondary)">No registered donors match yet. Invite past walk-in donors to join.</span><button style="height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;cursor:pointer">Invite donors</button></div></sc-if>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sReports }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="23 Reports" style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                <div style="display:flex;border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;background:var(--surface-1)">
+                  <sc-for list="{{ periods }}" as="p" hint-placeholder-count="2"><button onClick="{{ p.pick }}" style="height:36px;padding:0 16px;border:0;border-left:{{ p.left }};background:{{ p.bg }};color:{{ p.color }};font-size:13px;cursor:pointer">{{ p.label }}</button></sc-for>
+                </div>
+                <span style="flex:1;font-size:13px;color:var(--text-secondary)">{{ periodRange }}</span>
+                <button style="height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:var(--hover)"><i class="ti ti-download"></i>Download report</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+                <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+                  <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="font-size:13px;color:var(--text-secondary)">{{ k.label }}</span><span style="font-size:26px;font-weight:600;font-variant-numeric:tabular-nums">{{ k.v }}</span><span style="font-size:12px;color:{{ k.dc }}">{{ k.d }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:20px;align-items:start">
+                <div style="display:flex;flex-direction:column;gap:16px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                  <div style="display:flex;align-items:baseline"><span style="font-weight:600;flex:1">Units collected</span><span style="font-size:12px;color:var(--text-muted)">{{ chartNote }}</span></div>
+                  <div style="height:220px;display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--border-strong);padding-top:20px">
+                    <sc-for list="{{ bars }}" as="b" hint-placeholder-count="12">
+                      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%">
+                        <span style="font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums">{{ b.v }}</span>
+                        <div style="width:100%;max-width:36px;height:{{ b.h }}px;border-radius:4px 4px 0 0;background:{{ b.bg }};transition:height var(--dur-base) var(--ease-out)"></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:6px;margin-top:-8px"><sc-for list="{{ bars }}" as="b" hint-placeholder-count="12"><span style="flex:1;text-align:center;font-size:11px;color:var(--text-muted)">{{ b.l }}</span></sc-for></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                  <span style="font-weight:600">By blood group</span>
+                  <sc-for list="{{ byGroup }}" as="g" hint-placeholder-count="8">
+                    <div style="display:grid;grid-template-columns:48px 1fr 40px;gap:10px;align-items:center">
+                      <span style="display:inline-flex;align-items:center;justify-self:start;height:22px;padding:0 8px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-weight:600;font-size:12px">{{ g.g }}</span>
+                      <div style="height:8px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:{{ g.pct }}%;height:100%;background:var(--progress-fill);border-radius:999px;transition:width var(--dur-base) var(--ease-out)"></div></div>
+                      <span style="text-align:right;font-size:13px;font-variant-numeric:tabular-nums">{{ g.v }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sProfile }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="24 Hospital profile" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:20px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                <span style="font-weight:600">Public profile</span>
+                <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Hospital name</span><input value="Mirpur Central Hospital" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+                <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Blood bank address</span><input value="Ground floor, Road 2, Section 10, Mirpur, Dhaka 1216" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Opens</span><input value="8:00 am" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Closes</span><input value="10:00 pm" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Desk phone (shown to booked donors only)</span><input value="+880 2 9001 234" style="height:44px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-1);padding:0 12px;outline:none"></label>
+                <button style="align-self:flex-start;height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Save changes</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:20px">
+                <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1)">
+                  <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:var(--fill-accent);color:var(--on-fill);display:inline-flex;align-items:center;justify-content:center;font-size:15px"><i class="ti ti-check"></i></span><div style="flex:1"><div style="font-weight:600">Verified hospital</div><div style="font-size:12px;color:var(--text-secondary)">Donors see this badge on every request you post</div></div></div>
+                  <div style="display:flex;flex-direction:column">
+                    <sc-for list="{{ verif }}" as="v" hint-placeholder-count="4">
+                      <div style="display:flex;gap:12px">
+                        <div style="display:flex;flex-direction:column;align-items:center;width:18px"><span style="width:18px;height:18px;flex:none;border-radius:50%;background:{{ v.dotBg }};border:{{ v.dotBorder }};color:var(--on-fill);display:flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check" style="opacity:{{ v.op }}"></i></span><span style="flex:1;width:2px;min-height:14px;background:{{ v.line }}"></span></div>
+                        <div style="flex:1;display:flex;justify-content:space-between;gap:8px;padding-bottom:14px"><span style="font-size:13px">{{ v.label }}</span><span style="font-size:12px;color:{{ v.whenColor }}">{{ v.when }}</span></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                  <div style="padding:14px 16px;font-weight:600;border-bottom:1px solid var(--border)">Documents</div>
+                  <sc-for list="{{ docs }}" as="d" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:{{ d.top }}"><i class="ti ti-file-certificate" style="font-size:18px;color:var(--text-secondary)"></i><span style="flex:1;font-size:13px">{{ d.name }}</span><span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:{{ d.bg }};color:{{ d.fg }};font-size:12px;font-weight:600">{{ d.status }}</span></div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+                  <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)"><span style="font-weight:600;flex:1">Staff access</span><button style="height:32px;padding:0 10px;border:0;border-radius:var(--radius);background:transparent;color:var(--text-accent);cursor:pointer">Invite staff</button></div>
+                  <sc-for list="{{ staff }}" as="p" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:{{ p.top }}"><span style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">{{ p.ini }}</span><div style="flex:1"><div style="font-size:13px;font-weight:600">{{ p.name }}</div><div style="font-size:12px;color:var(--text-secondary)">{{ p.role }}</div></div><span style="font-size:12px;color:var(--text-muted)">{{ p.twofa }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:20px;background:var(--surface-2);font-size:13px;color:var(--text-secondary)">
+              <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">{{ note.num }} · design notes</div>
+              <div><span style="color:var(--text-primary);font-weight:600">Does</span> · {{ note.does }}</div>
+              <div><span style="color:var(--text-primary);font-weight:600">Leans on</span> · {{ note.leans }}</div>
+              <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · {{ note.trade }}</div>
+            </div>
+          </sc-if>
+        </div>
+      </main>
+    </div>
+
+    <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:var(--scrim)"></div>
+      <aside data-screen-label="20 Request drawer" style="position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);display:flex;flex-direction:column;background:var(--surface-3);border-left:1px solid var(--border-strong)">
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)">
+          <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:{{ dr.pbg }};color:{{ dr.pfg }};font-weight:600;font-size:13px">{{ dr.g }}</span>
+          <span style="font-size:13px;font-weight:600;color:{{ dr.urgColor }};flex:1">{{ dr.urg }} · {{ dr.deadline }}</span>
+          <button onClick="{{ closeDrawer }}" aria-label="Close" style="width:36px;height:36px;border:0;border-radius:50%;background:transparent;cursor:pointer;font-size:18px" style-hover="background:var(--hover)"><i class="ti ti-x"></i></button>
+        </div>
+        <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:18px;padding:16px">
+          <div style="flex-shrink:0"><div style="font-size:24px;font-weight:600;letter-spacing:-0.03em">{{ dr.title }}</div><div style="font-size:13px;color:var(--text-secondary)">{{ dr.meta }}</div></div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span>{{ dr.prog }}</span><span style="color:var(--text-secondary)">{{ dr.pct }}%</span></div>
+            <div style="height:6px;border-radius:999px;background:var(--progress-track);overflow:hidden"><div style="width:{{ dr.pct }}%;height:100%;background:var(--progress-fill);border-radius:999px"></div></div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:22px;background:var(--surface-1);box-shadow:var(--shadow-1);overflow:hidden">
+            <div style="padding:12px 14px;font-weight:600;border-bottom:1px solid var(--border)">Committed donors</div>
+            <sc-for list="{{ dr.donors }}" as="d" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:{{ d.top }}">
+                <span style="width:36px;height:36px;flex:none;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">{{ d.ini }}</span>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">{{ d.name }}</div><div style="font-size:12px;color:var(--text-secondary)">{{ d.meta }}</div></div>
+                <span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:{{ d.sbg }};color:{{ d.sfg }};font-size:12px;font-weight:600">{{ d.status }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ dr.noDonors }}" hint-placeholder-val="{{ false }}"><div style="padding:14px;font-size:13px;color:var(--text-secondary)">No commitments yet. Message eligible donors nearby to get the first one.</div></sc-if>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text-secondary)">
+            <div style="display:flex;gap:8px"><i class="ti ti-clock" style="margin-top:3px"></i>{{ dr.posted }}</div>
+            <div style="display:flex;gap:8px"><i class="ti ti-eye" style="margin-top:3px"></i>Seen by {{ dr.seen }} matching donors within 5 km</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--border)">
+          <button style="height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px" style-hover="background:var(--hover)"><i class="ti ti-send"></i>Message all</button>
+          <button style="height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--border-danger);background:transparent;color:var(--text-danger);cursor:pointer" style-hover="background:var(--bg-danger)">Close request</button>
+          <button style="flex:1;height:44px;padding:0 14px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;cursor:pointer">Mark fulfilled</button>
+        </div>
+      </aside>
+    </sc-if>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dashboard&quot;,&quot;options&quot;:[&quot;login&quot;,&quot;dashboard&quot;,&quot;inventory&quot;,&quot;requests&quot;,&quot;checkin&quot;,&quot;donors&quot;,&quot;reports&quot;,&quot;profile&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Review&quot;}}">
+class Component extends DCLogic {
+  state = { theme: localStorage.getItem('ld-theme') || 'light', screen: null, lg: 'pw', tfa: '', tfaErr: false, trust: true,
+    drawer: null, comp: 'All', ci: 0, checks: [true, false, false], bay: 3, dGroup: 'All', eligOnly: false, sel: [], compose: false, bulkSent: 0,
+    period: 'w', qpG: 'B−', qpU: 4, qpUrg: 1, qpPosted: null };
+  renderVals() {
+    const s = this.state;
+    const screen = s.screen || this.props.startScreen || 'dashboard';
+    const set = o => this.setState(o);
+    const pill = { danger: ['var(--bg-danger)', 'var(--text-danger)'], warning: ['var(--bg-warning)', 'var(--text-warning)'], success: ['var(--bg-success)', 'var(--text-success)'], neutral: ['var(--surface-2)', 'var(--text-secondary)'] };
+    const INV = [['A+', 42, 50], ['A−', 6, 12], ['B+', 51, 55], ['B−', 3, 12], ['O+', 58, 60], ['O−', 4, 15], ['AB+', 18, 20], ['AB−', 5, 8]];
+    const roleOf = (g, u, t) => { const r = u / t; return r < 0.4 ? (g.includes('−') ? 'danger' : 'warning') : r < 0.75 ? 'warning' : 'success'; };
+    const statusTxt = { danger: 'Shortage', warning: 'Low', success: 'Healthy' };
+    const urgMap = { c: ['Critical', 'var(--text-danger)', '2px solid var(--border-danger)'], u: ['Urgent', 'var(--text-warning)', '2px solid var(--border-warning)'], r: ['Routine', 'var(--text-secondary)', '2px solid var(--border)'] };
+    const REQ = [
+      { id: 1, g: 'O−', u: 'c', title: '3 bags for cardiac surgery', meta: 'Ward 4 · posted 2 h ago', need: 3, deadline: 'by 9:00 pm', seen: 41, posted: 'Posted today at 6:12 pm by Dr. Sultana',
+        donors: [['SK', 'Sadia K.', '0.9 km · ETA 12 min', 'Checked in', 'success'], ['FH', 'Farhan H.', '0.6 km · ETA 20 min', 'On the way', 'accent']] },
+      { id: 2, g: 'B−', u: 'u', title: 'Restock for weekend surgeries', meta: 'Blood bank · posted 40 min ago', need: 4, deadline: 'by Sat', seen: 18, posted: 'Posted today at 7:30 pm by Rafi M.',
+        donors: [['NR', 'Nusrat R.', 'Booked 4:30 pm', 'Booked', 'neutral']] },
+      { id: 3, g: 'O+', u: 'u', title: '6 bags, road accident trauma', meta: 'Emergency · posted 5 h ago', need: 6, deadline: 'today', seen: 96, posted: 'Posted today at 3:05 pm by Emergency desk',
+        donors: [['TS', 'Tania S.', 'Donated 5:10 pm', 'Donated', 'success'], ['MR', 'Mahmud R.', 'Donated 5:40 pm', 'Donated', 'success'], ['AI', 'Ayesha I.', 'ETA 30 min', 'On the way', 'accent'], ['JH', 'Jamal H.', 'Booked 9:00 pm', 'Booked', 'neutral']] },
+      { id: 4, g: 'A+', u: 'r', title: 'Thalassemia day-care', meta: 'Pediatrics · recurring', need: 2, deadline: 'Thu', seen: 22, posted: 'Recurring every Thursday', donors: [] }
+    ];
+    const reqRows = REQ.map((r, i) => { const [ul, uc, stripe] = urgMap[r.u]; const role = r.u === 'c' ? 'danger' : r.u === 'u' ? 'warning' : 'neutral'; const n = r.donors.length;
+      return { g: r.g, title: r.title, meta: r.meta, prog: `${n} of ${r.need} committed`, pct: Math.round(n / r.need * 100), urg: ul, urgColor: uc, stripe, top: i ? '1px solid var(--border)' : '0', pbg: pill[role][0], pfg: pill[role][1], selBg: s.drawer === r.id ? 'var(--bg-brand)' : 'transparent', open: () => set({ screen: 'requests', drawer: r.id }) }; });
+    const dReq = REQ.find(r => r.id === s.drawer);
+    const dRow = dReq ? reqRows[REQ.indexOf(dReq)] : null;
+    const sRole = { success: pill.success, accent: ['var(--bg-brand)', 'var(--text-brand)'], neutral: pill.neutral, warning: pill.warning };
+    const NAV = [['dashboard', 'Dashboard', 'ti-layout-dashboard', ''], ['inventory', 'Inventory', 'ti-droplet', '3 low'], ['requests', 'Requests', 'ti-urgent', '4'], ['checkin', 'Check-in', 'ti-scan', ''], ['donors', 'Donors', 'ti-users', ''], ['reports', 'Reports', 'ti-chart-bar', ''], ['profile', 'Hospital profile', 'ti-building-hospital', '']];
+    const titles = { dashboard: ['Dashboard', 'Monday, 19 October · Mirpur Central blood bank'], inventory: ['Blood inventory', '187 units on hand · updated 2 min ago'], requests: ['Requests', '4 open · 1 critical'], checkin: ['Donor check-in', 'Scan, verify, assign a bay'], donors: ['Donor directory', 'Registered donors within 10 km'], reports: ['Reports', 'Collections and fulfilment'], profile: ['Hospital profile', 'Public details and verification'] };
+    const NOTES = {
+      dashboard: ['18', 'One glance at stock, open requests, today\'s queue, and a quick way to post.', 'Stat tiles, BloodGroupPill roles on inventory, UrgencyRows, in-flow tiles only — no floating cards.', 'Quick post covers the 80% case; complex requests still go through the full form.'],
+      inventory: ['19', 'Stock by group and component, plus a bag-level expiry list.', 'Role-colored pills and cells (danger for Rh-negative shortage), 2px stripes for expiring bags.', 'Grid over chart — exact counts matter more than trend shape here.'],
+      requests: ['20', 'Open requests; select one to see committed donors in a drawer.', 'Drawer is the single floating plane (surface-3 + border-strong) over a scrim; UrgencyRow list underneath.', 'Drawer hides the list on narrow screens — accepted for focus.'],
+      checkin: ['21', 'Three-step desk flow: scan the passport, verify on the spot, assign a bay.', 'EligibilityStepper reused, passport card on surface-2, bay tiles with 2px selected border.', 'Manual Hb entry stays required even when the app pre-check passed.'],
+      donors: ['22', 'Find donors by group and eligibility, then message them in bulk.', 'Filter chips with accent selection, DonorAvatar with availability dot, bg-accent bulk bar.', 'Bulk messages go in-app only — no SMS blasts, so reach depends on app installs.'],
+      reports: ['23', 'Weekly or monthly collection trends and fulfilment health.', 'Flat bars in progress-fill, the current period highlighted in fill-accent; no gridline clutter.', 'No per-donor reporting here — aggregate only, by design, for privacy.'],
+      profile: ['24', 'Edit public details and track verification renewal.', 'VerifiedBadge at larger size, vertical stepper for verification, status pills for documents.', 'Verification is manual and annual — slower onboarding, but it keeps fake SOS out.']
+    };
+    const n = NOTES[screen] || NOTES.dashboard;
+    const COMPS = ['Whole blood', 'Red cells', 'Plasma', 'Platelets'];
+    const ci = COMPS.indexOf(s.comp);
+    const split = (u) => [Math.round(u * .45), Math.round(u * .3), Math.round(u * .18), u - Math.round(u * .45) - Math.round(u * .3) - Math.round(u * .18)];
+    const BATCH = [['MCH-24-10-0412', 'O+', 'Platelets', '20 Oct', 1, 5], ['MCH-24-10-0398', 'AB+', 'Platelets', '21 Oct', 2, 5], ['MCH-24-09-0255', 'A+', 'Red cells', '22 Oct', 3, 42], ['MCH-24-09-0261', 'B+', 'Whole blood', '23 Oct', 4, 35], ['MCH-24-09-0270', 'O+', 'Whole blood', '24 Oct', 5, 35], ['MCH-24-09-0288', 'A−', 'Red cells', '25 Oct', 6, 42]].filter(b => s.comp === 'All' || b[2] === s.comp);
+    const DONORS = [['FH', 'Farhan H.', 'O−', 'Mirpur 10', '14 Jun', 'Eligible', 7], ['SK', 'Sadia K.', 'O−', 'Pallabi', '02 Jul', 'Eligible', 3], ['RM', 'Rafiq M.', 'B−', 'Kazipara', '28 Aug', 'In 6 weeks', 12], ['NB', 'Nadia B.', 'B−', 'Mirpur 2', '11 Mar', 'Eligible', 4], ['AI', 'Ayesha I.', 'A+', 'Shewrapara', '19 Oct', 'Recovering', 2], ['MR', 'Mahmud R.', 'B+', 'Mirpur 12', '09 May', 'Eligible', 5], ['TS', 'Tania S.', 'O+', 'Mirpur 1', '19 Oct', 'Recovering', 9], ['JH', 'Jamal H.', 'AB+', 'Pallabi', '—', 'Eligible', 0], ['KA', 'Kamrul A.', 'A−', 'Agargaon', '30 Jan', 'Eligible', 6]];
+    const dVis = DONORS.filter(d => (s.dGroup === 'All' || d[2] === s.dGroup) && (!s.eligOnly || d[5] === 'Eligible'));
+    const W = { w: { l: ['W33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44'], v: [62, 70, 58, 81, 77, 90, 86, 73, 95, 88, 102, 86] }, m: { l: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'], v: [298, 341, 280, 262, 305, 322, 290, 276, 318, 352, 371, 344] } }[s.period];
+    const mx = Math.max(...W.v);
+    const GB = [['O+', 31], ['B+', 27], ['A+', 22], ['AB+', 8], ['O−', 4], ['B−', 3], ['A−', 3], ['AB−', 2]];
+    const seg = (opts, cur, pick) => opts.map(([k, l], i) => ({ label: l, left: i ? '1px solid var(--border-strong)' : '0', bg: k === cur ? 'var(--fill-primary)' : 'transparent', color: k === cur ? 'var(--on-primary)' : 'var(--text-primary)', pick: () => pick(k) }));
+    const chip = (g, cur, pick) => { const on = g === cur; return { label: g, pick: () => pick(g), border: on ? '1.5px solid var(--fill-brand)' : '1px solid var(--border-strong)', bg: on ? 'var(--bg-brand)' : 'var(--surface-1)', color: on ? 'var(--text-brand)' : 'var(--text-primary)' }; };
+    const GROUPS = ['A+', 'A−', 'B+', 'B−', 'O+', 'O−', 'AB+', 'AB−'];
+    const ciBlocked = !s.checks.every(Boolean);
+    const BAYS = [[1, 'busy', 'Donating · 12 min left'], [2, 'free', 'Free'], [3, 'free', 'Free'], [4, 'clean', 'Cleaning · 3 min'], [5, 'busy', 'Donating · 20 min left'], [6, 'free', 'Free']];
+    return {
+      theme: s.theme, themeLabel: s.theme === 'dark' ? 'Light' : 'Dark', themeIcon: s.theme === 'dark' ? 'ti-sun' : 'ti-moon',
+      toggleTheme: () => { const t = s.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('ld-theme', t); set({ theme: t }); },
+      showNotes: this.props.showNotes ?? true,
+      isLogin: screen === 'login', isApp: screen !== 'login',
+      lgPw: s.lg === 'pw', lg2fa: s.lg === '2fa', toTwoFa: () => set({ lg: '2fa' }), backToPw: () => set({ lg: 'pw' }),
+      tfa: s.tfa, setTfa: e => set({ tfa: e.target.value.replace(/\D/g, '').slice(0, 6), tfaErr: false }), tfaErr: s.tfaErr,
+      tfaBorder: s.tfaErr ? '1px solid var(--border-danger)' : '1px solid var(--border-stronger)',
+      verify2fa: () => s.tfa.length === 6 ? set({ screen: 'dashboard', lg: 'pw', tfa: '' }) : set({ tfaErr: true }),
+      toggleTrust: () => set({ trust: !s.trust }), trustBorder: s.trust ? '0' : '1px solid var(--border-stronger)', trustBg: s.trust ? 'var(--fill-brand)' : 'transparent', trustOp: s.trust ? 1 : 0,
+      logout: () => set({ screen: 'login', drawer: null }),
+      nav: NAV.map(([k, l, ic, b]) => ({ label: l, icon: ic, badge: b, badgeColor: k === 'inventory' ? 'var(--text-danger)' : 'var(--text-muted)', bg: k === screen ? 'var(--surface-2)' : 'transparent', color: k === screen ? 'var(--text-primary)' : 'var(--text-secondary)', weight: k === screen ? 500 : 400, go: () => set({ screen: k, drawer: null }) })),
+      pageTitle: (titles[screen] || titles.dashboard)[0], pageSub: (titles[screen] || titles.dashboard)[1],
+      note: { num: n[0], does: n[1], leans: n[2], trade: n[3] },
+      sDash: screen === 'dashboard', sInv: screen === 'inventory', sReq: screen === 'requests', sCheck: screen === 'checkin', sDonors: screen === 'donors', sReports: screen === 'reports', sProfile: screen === 'profile',
+      goInv: () => set({ screen: 'inventory' }), goReq: () => set({ screen: 'requests' }), goCheckin: () => set({ screen: 'checkin', ci: 0 }),
+      stats: [['Open requests', '4', '1 critical · O−', 'var(--text-danger)'], ['Checked in today', '14', '3 in bays now', 'var(--text-secondary)'], ['Collected this week', '86', '+12% vs last week', 'var(--text-success)'], ['Expiring in 72 h', '9', '2 platelet bags tomorrow', 'var(--text-warning)']].map(([label, value, sub, subColor]) => ({ label, value, sub, subColor })),
+      inv: INV.map(([g, u, t]) => { const r = roleOf(g, u, t); return { g, units: u, target: t, pct: Math.min(100, Math.round(u / t * 100)), bg: pill[r][0], fg: pill[r][1], bar: pill[r][1], status: statusTxt[r] }; }),
+      reqRows,
+      queue: [['NR', 'Nusrat R.', 'O− · 4:30 pm', 'Waiting', 'neutral'], ['TS', 'Tania S.', 'O+ · bay 1', 'Donating', 'accent'], ['MR', 'Mahmud R.', 'B+ · bay 5', 'Donating', 'accent'], ['KA', 'Kamrul A.', 'A− · 5:00 pm', 'Screening', 'warning']].map(([ini, name, meta, status, r], i) => ({ ini, name, meta, status, top: i ? '1px solid var(--border)' : '0', sbg: sRole[r][0], sfg: sRole[r][1] })),
+      qpGroups: GROUPS.map(g => chip(g, s.qpG, v => set({ qpG: v, qpPosted: null }))),
+      qpUnits: s.qpU, qpMinus: () => set({ qpU: Math.max(1, s.qpU - 1) }), qpPlus: () => set({ qpU: Math.min(20, s.qpU + 1) }),
+      qpUrg: seg([[0, 'Routine'], [1, 'Urgent'], [2, 'Critical']], s.qpUrg, v => set({ qpUrg: v })),
+      qpPost: () => set({ qpPosted: `${s.qpU} bags of ${s.qpG}` }), qpPosted: !!s.qpPosted,
+      qpPostedText: `Request posted for ${s.qpPosted}. Matching donors within 5 km are being alerted.`,
+      compTabs: seg([['All', 'All'], ...COMPS.map(c => [c, c])], s.comp, v => set({ comp: v })),
+      compHeads: COMPS.map((c, i) => ({ label: c, color: i === ci ? 'var(--text-primary)' : 'var(--text-muted)', bg: i === ci ? 'var(--bg-brand)' : 'transparent' })),
+      invTable: INV.map(([g, u, t], ri) => { const r = roleOf(g, u, t); return { g, bg: pill[r][0], fg: pill[r][1], status: `${statusTxt[r]} · ${u} of ${t}`, top: ri ? '1px solid var(--border)' : '0', cells: split(u).map((v, i) => ({ v, bg: i === ci ? 'var(--bg-brand)' : 'transparent', color: v === 0 ? 'var(--text-danger)' : 'var(--text-primary)' })) }; }),
+      expCount: BATCH.length,
+      batches: BATCH.map(([id, g, comp, exp, left, life], i) => { const crit = left <= 2; return { id, g, comp, exp, left: left === 1 ? 'Tomorrow' : `${left} days`, pct: Math.max(4, Math.round(left / Math.min(life, 7) * 100)), bar: crit ? 'var(--fill-danger)' : 'var(--fill-warning)', color: crit ? 'var(--text-danger)' : 'var(--text-warning)', stripe: crit ? '2px solid var(--border-danger)' : '2px solid var(--border-warning)', top: i ? '1px solid var(--border)' : '0' }; }),
+      drawerOpen: !!dReq, closeDrawer: () => set({ drawer: null }),
+      dr: dReq ? { g: dReq.g, title: dReq.title, meta: dReq.meta, urg: dRow.urg, urgColor: dRow.urgColor, pbg: dRow.pbg, pfg: dRow.pfg, deadline: dReq.deadline, prog: dRow.prog, pct: dRow.pct, seen: dReq.seen, posted: dReq.posted, noDonors: dReq.donors.length === 0,
+        donors: dReq.donors.map(([ini, name, meta, status, r], i) => ({ ini, name, meta, status, top: i ? '1px solid var(--border)' : '0', sbg: sRole[r][0], sfg: sRole[r][1] })) } : { donors: [] },
+      ciBars: ['Scan', 'Verify', 'Assign bay'].map((l, i) => ({ label: `${i + 1}. ${l}`, bg: i <= s.ci ? 'var(--fill-brand)' : 'var(--progress-track)', color: i === s.ci ? 'var(--text-primary)' : 'var(--text-muted)' })),
+      ci1: s.ci === 0, ci2: s.ci === 1, ci3: s.ci === 2, ci4: s.ci === 3,
+      ciNext: () => set({ ci: Math.min(3, s.ci + 1) }), ciBack: () => set({ ci: Math.max(0, s.ci - 1) }), ciReset: () => set({ ci: 0, checks: [true, false, false] }),
+      ciChecks: ['Photo ID matches the passport name', 'Blood pressure within range', 'Donor confirmed consent at the desk'].map((label, i) => { const on = s.checks[i]; return { label, top: i ? '1px solid var(--border)' : '0', border: on ? '0' : '1px solid var(--border-stronger)', bg: on ? 'var(--fill-brand)' : 'transparent', op: on ? 1 : 0, toggle: () => { const c = s.checks.slice(); c[i] = !c[i]; set({ checks: c }); } }; }),
+      ciBlocked, ciBtnBg: ciBlocked ? 'var(--surface-2)' : 'var(--fill-brand)', ciBtnFg: ciBlocked ? 'var(--text-disabled)' : 'var(--on-fill)',
+      bays: BAYS.map(([num, st, label]) => { const on = num === s.bay; const busy = st !== 'free'; return { n: num, status: label, busy, pick: () => set({ bay: num }), border: on ? '1.5px solid var(--fill-brand)' : '1px solid var(--border)', bg: busy ? 'var(--surface-2)' : on ? 'var(--bg-brand)' : 'var(--surface-1)', color: busy ? 'var(--text-muted)' : on ? 'var(--text-brand)' : 'var(--text-primary)', sColor: busy ? 'var(--text-muted)' : 'var(--text-success)', dot: st === 'busy' ? 'var(--fill-brand)' : st === 'clean' ? 'var(--fill-warning)' : 'var(--fill-success)' }; }),
+      bayN: s.bay,
+      dChips: ['All', ...GROUPS].map(g => chip(g, s.dGroup, v => set({ dGroup: v }))),
+      toggleElig: () => set({ eligOnly: !s.eligOnly }), eligBg: s.eligOnly ? 'var(--bg-brand)' : 'transparent', eligFg: s.eligOnly ? 'var(--text-brand)' : 'var(--text-primary)',
+      dRows: dVis.map(([ini, name, g, area, last, status, nn], i) => { const on = s.sel.includes(name); return { ini, name, g, area, last, status, n: nn, top: i ? '1px solid var(--border)' : '0', rowBg: on ? 'var(--bg-brand)' : 'transparent', cbBorder: on ? '0' : '1px solid var(--border-stronger)', cbBg: on ? 'var(--fill-brand)' : 'transparent', op: on ? 1 : 0, dot: status === 'Eligible' ? 'var(--fill-success)' : 'var(--fill-warning)', sColor: status === 'Eligible' ? 'var(--text-success)' : 'var(--text-warning)', toggle: () => set({ sel: on ? s.sel.filter(x => x !== name) : [...s.sel, name], bulkSent: 0 }) }; }),
+      dEmpty: dVis.length === 0,
+      hasSel: s.sel.length > 0, selCount: s.sel.length, clearSel: () => set({ sel: [], compose: false }),
+      openCompose: () => set({ compose: true }), closeCompose: () => set({ compose: false }), composeOpen: s.compose && s.sel.length > 0,
+      sendBulk: () => set({ bulkSent: s.sel.length, sel: [], compose: false }), bulkSent: s.bulkSent > 0, bulkSentN: s.bulkSent,
+      periods: seg([['w', 'Weekly'], ['m', 'Monthly']], s.period, v => set({ period: v })),
+      periodRange: s.period === 'w' ? 'Last 12 weeks · 10 Aug – 1 Nov 2026' : 'Last 12 months · Nov 2025 – Oct 2026',
+      chartNote: s.period === 'w' ? 'Units per week' : 'Units per month',
+      bars: W.v.map((v, i) => ({ v, l: W.l[i], h: Math.round(v / mx * 170), bg: i === W.v.length - 1 ? 'var(--fill-brand)' : 'var(--progress-track)' })),
+      kpis: (s.period === 'w' ? [['Units collected', '86', '−15% vs last week', 'var(--text-warning)'], ['Requests fulfilled', '92%', '+4 pts', 'var(--text-success)'], ['Median time to fill', '3 h 40 m', '−25 min', 'var(--text-success)'], ['Deferral rate', '8%', 'Flat', 'var(--text-secondary)']] : [['Units collected', '344', '−7% vs September', 'var(--text-warning)'], ['Requests fulfilled', '89%', '+2 pts', 'var(--text-success)'], ['Median time to fill', '4 h 05 m', '−40 min', 'var(--text-success)'], ['Deferral rate', '9%', '+1 pt', 'var(--text-warning)']]).map(([label, v, d, dc]) => ({ label, v, d, dc })),
+      byGroup: GB.map(([g, p]) => ({ g, pct: Math.round(p / 31 * 100), v: Math.round(p / 100 * (s.period === 'w' ? 86 : 344)) })),
+      verif: [['Documents submitted', '12 Feb 2026', 1], ['DGHS license verified', '20 Feb 2026', 1], ['Site visit by Roktora', '3 Mar 2026', 1], ['Annual renewal', 'Due 3 Mar 2027', 0]].map(([label, when, done], i, a) => ({ label, when, op: done ? 1 : 0, dotBg: done ? 'var(--fill-brand)' : 'transparent', dotBorder: done ? '0' : '1px solid var(--border-stronger)', line: i === a.length - 1 ? 'transparent' : 'var(--border-accent)', whenColor: done ? 'var(--text-muted)' : 'var(--text-warning)' })),
+      docs: [['DGHS blood bank license', 'Verified', 'success'], ['Trade license', 'Verified', 'success'], ['Fire safety certificate', 'Expires in 40 days', 'warning']].map(([name, status, r], i) => ({ name, status, top: i ? '1px solid var(--border)' : '0', bg: pill[r][0], fg: pill[r][1] })),
+      staff: [['DS', 'Dr. Sultana', 'Admin · blood bank lead', '2FA on'], ['RM', 'Rafi M.', 'Staff · inventory', '2FA on'], ['ED', 'Emergency desk', 'Shared · post requests only', '2FA on']].map(([ini, name, role, twofa], i) => ({ ini, name, role, twofa, top: i ? '1px solid var(--border)' : '0' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

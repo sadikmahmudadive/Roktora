@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Private profile: only the owner. Contains full name and exact dates.
+    match /users/{uid} {
+      allow read, create, update: if isOwner(uid);
+      allow delete: if false;
+
+      // Donation history is private to the donor.
+      match /donations/{id} {
+        allow read, create: if isOwner(uid);
+        allow update, delete: if false;
+      }
+    }
+
+    // Public donor directory: privacy-safe subset (first name + initial, group, area).
+    match /donors/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['publicName', 'bloodGroup', 'area', 'available', 'donations']);
+      allow delete: if false;
+    }
+
+    match /requests/{requestId} {
+      function isCommittedOrOwner() {
+        let r = get(/databases/$(database)/documents/requests/$(requestId)).data;
+        return request.auth.uid in r.get('committedUids', []) || r.get('createdBy', '') == request.auth.uid;
+      }
+
+      allow read: if signedIn();
+
+      // Individuals can post, but never as verified and never pre-committed.
+      // Verified hospital requests are written with the Admin SDK / console only.
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.verified == false
+        && request.resource.data.committedUids.size() == 0
+        && request.resource.data.bagsNeeded is int
+        && request.resource.data.bagsNeeded >= 1 && request.resource.data.bagsNeeded <= 10
+        && request.resource.data.title is string && request.resource.data.title.size() <= 120;
+
+      // Donors may only add or remove their own uid from committedUids.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['committedUids'])
+        && (
+          request.resource.data.committedUids.toSet().difference(resource.data.committedUids.toSet()).hasOnly([request.auth.uid])
+          && resource.data.committedUids.toSet().difference(request.resource.data.committedUids.toSet()).hasOnly([request.auth.uid])
+        );
+
+      allow delete: if signedIn() && resource.data.get('createdBy', '') == request.auth.uid;
+
+      // Chat is limited to the requester and donors who committed.
+      match /messages/{messageId} {
+        allow read: if signedIn() && isCommittedOrOwner();
+        allow create: if signedIn() && isCommittedOrOwner()
+          && request.resource.data.fromUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
+        allow update, delete: if false;
+      }
+    }
+  }
+}

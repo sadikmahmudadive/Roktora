@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root,[data-theme=light]{color-scheme:light;--surface-0:#f3f2ef;--surface-1:#ffffff;--surface-2:#eae8e3;--surface-3:#ffffff;--text-primary:#141413;--text-secondary:#55534d;--text-muted:#76736c;--text-disabled:#b3b0a8;--text-accent:#1d5fbf;--text-danger:#b3261e;--text-success:#1b6b3c;--text-warning:#7f4c00;--text-brand:#b01a30;--border:rgba(20,20,19,.1);--border-strong:rgba(20,20,19,.2);--border-stronger:rgba(20,20,19,.4);--border-accent:#2f6fd1;--border-danger:#c8321f;--border-success:#2b8a4b;--border-warning:#c98a12;--fill-primary:#141413;--fill-accent:#2f6fd1;--fill-danger:#c8321f;--fill-success:#22995a;--fill-warning:#b97c0c;--fill-brand:#d42a40;--on-fill:#ffffff;--on-primary:#f7f6f3;--bg-accent:#e6eefb;--bg-danger:#fce9e6;--bg-success:#e2f3e8;--bg-warning:#fcf0d8;--bg-brand:#fde8ea;--progress-track:rgba(20,20,19,.08);--progress-fill:#d42a40;--hover:rgba(20,20,19,.04);--press:rgba(20,20,19,.08);--shadow-1:0 1px 2px rgba(20,20,19,.06),0 4px 14px rgba(20,20,19,.06);--shadow-2:0 2px 6px rgba(20,20,19,.06),0 18px 40px -12px rgba(20,20,19,.18);--glass:rgba(243,242,239,.78)}
+[data-theme=dark]{color-scheme:dark;--surface-0:#121211;--surface-1:#1d1c1b;--surface-2:#282725;--surface-3:#323130;--text-primary:#f4f2ec;--text-secondary:#c2bfb7;--text-muted:#9a978f;--text-disabled:#5f5d58;--text-accent:#8fb5f3;--text-danger:#f2a093;--text-success:#8dd3a5;--text-warning:#ecc679;--text-brand:#ff9aa7;--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.18);--border-stronger:rgba(255,255,255,.36);--border-accent:#5b92e6;--border-danger:#e0614e;--border-success:#4aa86a;--border-warning:#d69b2a;--fill-primary:#f4f2ec;--fill-accent:#3d7ddb;--fill-danger:#cf4632;--fill-success:#2f9f5f;--fill-warning:#b57f14;--fill-brand:#e5384e;--on-fill:#ffffff;--on-primary:#121211;--bg-accent:#1b2740;--bg-danger:#3a1f1b;--bg-success:#18301f;--bg-warning:#382c15;--bg-brand:#3b171d;--progress-track:rgba(255,255,255,.1);--progress-fill:#e5384e;--hover:rgba(255,255,255,.05);--press:rgba(255,255,255,.1);--shadow-1:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--shadow-2:0 2px 6px rgba(0,0,0,.3),0 18px 40px -12px rgba(0,0,0,.6);--glass:rgba(18,18,17,.75)}
+:root{--radius:14px;--radius-card:24px;--font-sans:"Instrument Sans","Hind Siliguri",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--dur-fast:90ms;--dur-snap:140ms;--dur-base:220ms;--dur-slow:360ms;--ease-out:cubic-bezier(.2,.7,.2,1);--ease-snap:cubic-bezier(.3,0,.2,1);--ease-overshoot:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box}body{margin:0;font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+a{color:var(--text-accent);text-decoration:none;font-weight:500}a:hover{text-decoration:underline}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--border-accent);outline-offset:2px}
+input::placeholder{color:var(--text-disabled)}
+@keyframes ldPulse{0%{transform:scale(.85);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+@keyframes ldSlide{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100vh;background:var(--surface-0);color:var(--text-primary);font-family:var(--font-sans);font-size:14px;line-height:1.5">
+  <header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 24px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-0.02em"><svg viewBox="520 440 702 1040" style="height:26px;width:auto;flex:none;display:block" aria-hidden="true"><path style="fill:var(--fill-brand)" d="M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z"></path></svg>Roktora</div>
+    <nav style="display:flex;gap:2px;flex-wrap:wrap;padding:4px;border-radius:999px;background:var(--surface-1);border:1px solid var(--border)">
+      <a href="00 Components v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Components</a>
+      <a href="01 Mobile - Onboarding and auth v2.dc.html" style="padding:6px 14px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)" style-hover="text-decoration:none">Onboarding and auth</a>
+      <a href="02 Mobile - Donor core v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Donor core loop</a>
+      <a href="03 Mobile - Post-donation and profile v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Post-donation</a>
+      <a href="04 Hospital dashboard v2.dc.html" style="padding:6px 14px;border-radius:999px;color:var(--text-secondary)" style-hover="background:var(--hover);text-decoration:none">Hospital</a>
+    </nav>
+    <span style="flex:1"></span>
+    <button onClick="{{ toggleTheme }}" aria-label="Toggle theme" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface-1);cursor:pointer;font-weight:500" style-hover="background:var(--surface-2)"><i class="ti {{ themeIcon }}" style="font-size:17px"></i>{{ themeLabel }}</button>
+  </header>
+
+  <section style="padding:40px 40px 8px;display:flex;flex-direction:column;gap:8px;max-width:760px">
+    <div style="display:flex;gap:8px;align-items:center"><span style="font-family:var(--font-mono);font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:var(--bg-brand);color:var(--text-brand)">v2 · refresh</span><span style="font-size:13px;color:var(--text-muted)">5 screens</span></div>
+    <h1 style="margin:0;font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Onboarding and auth</h1>
+    <p style="margin:0;font-size:16px;color:var(--text-secondary);text-wrap:pretty">Brand red leads, display-scale type, soft layered surfaces, pill actions, and UI-fragment illustrations in place of icon tiles.</p>
+  </section>
+
+  <section style="padding:32px 40px 64px;display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+
+    <div id="1" style="width:390px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">01</span><span style="font-weight:600">Splash</span></div>
+      <div data-screen-label="01 Splash" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--fill-brand);color:#fff;border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column">
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:0 32px;text-align:center">
+          {{ pulse }}
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:44px;font-weight:700;letter-spacing:-0.045em;line-height:1">Roktora</div>
+            <div style="font-size:16px;font-weight:500;opacity:.85">রক্তরা</div>
+          </div>
+          <div style="font-size:19px;font-weight:500;letter-spacing:-0.01em;opacity:.95">Blood, a short walk away.</div>
+        </div>
+        <div style="padding:0 32px 56px;display:flex;flex-direction:column;gap:12px;align-items:center">
+          {{ loader }}
+          <div style="font-size:13px;font-weight:500;opacity:.85">Finding donors near you</div>
+        </div>
+        <div style="position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:#fff;opacity:.9"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty;padding:0 4px">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Full-bleed brand moment while the donor cache warms.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Modern move</span> · Edge-to-edge brand color, heartbeat rings, 44px tight-tracked wordmark.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Rings are CSS only — still light on 2G.</div>
+      </div>
+    </div>
+
+    <div id="2" style="width:390px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">02</span><span style="font-weight:600">Onboarding · {{ obIndex }} of 3</span></div>
+      <div data-screen-label="02 Onboarding" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column">
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 24px">
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ obDots }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.go }}" aria-label="Go to slide" style="width:{{ d.w }}px;height:8px;padding:0;border:0;border-radius:999px;background:{{ d.bg }};cursor:pointer;transition:width var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out)"></button>
+            </sc-for>
+          </div>
+          <button onClick="{{ obSkip }}" style="height:36px;padding:0 14px;border:0;background:var(--surface-2);color:var(--text-secondary);border-radius:999px;cursor:pointer;font-weight:500;font-size:13px" style-hover="background:var(--press)">Skip</button>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:8px 16px 0;gap:28px">
+          <sc-if value="{{ obIs0 }}" hint-placeholder-val="{{ true }}">
+            <div style="height:404px;border-radius:36px;background:var(--bg-brand);position:relative;overflow:hidden">
+              <div style="position:absolute;left:50%;top:46%;width:330px;height:330px;margin:-165px 0 0 -165px;border-radius:50%;border:1px dashed var(--border-strong)"></div>
+              <div style="position:absolute;left:50%;top:46%;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;border:1px solid var(--border-strong)"></div>
+              <div style="position:absolute;left:50%;top:46%;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;background:var(--surface-1);opacity:.6"></div>
+              <div style="position:absolute;left:50%;top:46%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--fill-brand);border:4px solid var(--surface-1);box-shadow:0 0 0 8px rgba(212,42,64,.18)"></div>
+              <div style="position:absolute;left:52px;top:62px;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">TA</span><span style="font-size:12px;font-weight:600">O− · 400 m</span></div>
+              <div style="position:absolute;right:30px;top:150px;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">FH</span><span style="font-size:12px;font-weight:600">O− · 650 m</span></div>
+              <div style="position:absolute;left:40px;top:250px;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">MS</span><span style="font-size:12px;font-weight:600">O− · 900 m</span></div>
+              <div style="position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:20px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="width:8px;height:8px;border-radius:50%;background:var(--fill-success);box-shadow:0 0 0 4px var(--bg-success)"></span><span style="flex:1;font-weight:600;font-size:14px">3 donors within 1 km</span><span style="font-size:12px;color:var(--text-muted)">Live</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ obIs1 }}" hint-placeholder-val="{{ false }}">
+            <div style="height:404px;border-radius:36px;background:var(--bg-accent);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center">
+              <div style="position:absolute;width:280px;height:170px;top:78px;border-radius:24px;background:var(--surface-1);opacity:.55;transform:rotate(-6deg)"></div>
+              <div style="position:relative;width:300px;display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:24px;background:var(--surface-1);box-shadow:var(--shadow-2)">
+                <div style="display:flex;align-items:center;gap:12px"><span style="width:42px;height:42px;border-radius:14px;background:var(--bg-accent);color:var(--text-accent);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="ti ti-building-hospital"></i></span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;font-weight:600">Dhanmondi General<span style="width:16px;height:16px;border-radius:50%;background:var(--fill-accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px"><i class="ti ti-check"></i></span></div><div style="font-size:12px;color:var(--text-muted)">Hospital · 1.2 km</div></div></div>
+                <div style="display:flex;align-items:center;gap:10px"><span style="height:28px;padding:0 12px;border-radius:999px;background:var(--bg-danger);color:var(--text-danger);font-weight:600;font-size:13px;display:inline-flex;align-items:center">O−</span><span style="font-weight:500">2 bags for surgery</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);font-size:13px"><span style="color:var(--text-danger);font-weight:600">Critical · 3 h left</span><span style="color:var(--text-muted)">1 of 2 committed</span></div>
+              </div>
+              <div style="position:absolute;right:28px;top:40px;display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:999px;background:var(--fill-accent);color:#fff;font-weight:600;font-size:13px;box-shadow:var(--shadow-1);transform:rotate(4deg)"><i class="ti ti-rosette-discount-check" style="font-size:17px"></i>Verified</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ obIs2 }}" hint-placeholder-val="{{ false }}">
+            <div style="height:404px;border-radius:36px;background:var(--bg-success);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:0;padding:0 36px">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:20px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="width:38px;height:38px;border-radius:12px;background:var(--bg-danger);color:var(--text-danger);display:flex;align-items:center;justify-content:center;font-size:18px"><i class="ti ti-bell-ringing"></i></span><span style="flex:1;font-weight:600">O− alert nearby</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">10:02</span></div>
+              <div style="width:2px;height:22px;margin-left:34px;background:var(--border-strong)"></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:20px;background:var(--surface-1);box-shadow:var(--shadow-1)"><span style="width:38px;height:38px;border-radius:12px;background:var(--bg-accent);color:var(--text-accent);display:flex;align-items:center;justify-content:center;font-size:18px"><i class="ti ti-hand-finger"></i></span><span style="flex:1;font-weight:600">Committed in 1 tap</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">10:03</span></div>
+              <div style="width:2px;height:22px;margin-left:34px;background:var(--border-strong)"></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:20px;background:var(--fill-success);color:#fff;box-shadow:var(--shadow-1)"><span style="width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px"><i class="ti ti-qrcode"></i></span><span style="flex:1;font-weight:600">Checked in, donated</span><span style="font-family:var(--font-mono);font-size:12px;opacity:.9">11:52</span></div>
+            </div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:12px;padding:0 8px">
+            <h1 style="margin:0;font-weight:600;font-size:34px;line-height:1.06;letter-spacing:-0.035em;text-wrap:balance">{{ ob.title }}</h1>
+            <p style="margin:0;font-size:16px;color:var(--text-secondary);text-wrap:pretty">{{ ob.body }}</p>
+          </div>
+        </div>
+        <div style="padding:16px 24px 40px">
+          <button onClick="{{ obNext }}" style="width:100%;height:58px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform var(--dur-fast) var(--ease-snap)" style-active="transform:scale(.98)">{{ obCta }}<i class="ti ti-arrow-right" style="font-size:18px"></i></button>
+        </div>
+        <div style="position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty;padding:0 4px">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Three promises — proximity, trust, speed.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Modern move</span> · Each slide shows a real product fragment (radar, verified card, timeline) instead of a generic icon.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Fragments must be kept in sync with the real components.</div>
+      </div>
+    </div>
+
+    <div id="3" style="width:390px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">03</span><span style="font-weight:600">Login · {{ loginStepName }}</span></div>
+      <div data-screen-label="03 Login" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column">
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:60px;display:flex;align-items:center;padding:0 16px">
+          <button onClick="{{ backToPhone }}" aria-label="Back" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)"><i class="ti ti-arrow-left"></i></button>
+        </div>
+        <sc-if value="{{ isPhone }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;padding:12px 24px 44px;gap:28px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.035em;line-height:1.06">What's your number?</h1>
+              <p style="margin:0;font-size:15px;color:var(--text-secondary);text-wrap:pretty">We'll text a 6-digit code. Your number is never shown to other users.</p>
+            </div>
+            <label style="display:flex;height:64px;border:1px solid var(--border-strong);border-radius:20px;background:var(--surface-1);overflow:hidden;box-shadow:var(--shadow-1)">
+              <span style="display:flex;align-items:center;gap:6px;padding:0 14px 0 18px;border-right:1px solid var(--border);font-weight:600"><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted)">BD</span>+880<i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted)"></i></span>
+              <input value="{{ phone }}" onChange="{{ setPhone }}" inputMode="numeric" aria-label="Phone number" placeholder="1712 345678" style="flex:1;min-width:0;border:0;background:transparent;padding:0 16px;font-size:19px;font-weight:500;letter-spacing:0.02em;font-variant-numeric:tabular-nums;outline:none">
+            </label>
+            <button onClick="{{ sendCode }}" style="height:58px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;font-size:16px;cursor:pointer;transition:transform var(--dur-fast) var(--ease-snap)" style-active="transform:scale(.98)">Send code</button>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:12px;color:var(--text-muted);font-size:13px"><span style="flex:1;height:1px;background:var(--border)"></span>or continue with<span style="flex:1;height:1px;background:var(--border)"></span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <button style="height:54px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-1);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-weight:600" style-hover="background:var(--surface-2)"><i class="ti ti-brand-google-filled" style="font-size:19px"></i>Google</button>
+                <button style="height:54px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-1);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-weight:600" style-hover="background:var(--surface-2)"><i class="ti ti-brand-facebook-filled" style="font-size:19px"></i>Facebook</button>
+              </div>
+            </div>
+            <div style="margin-top:auto;font-size:14px;color:var(--text-secondary);text-align:center">New to Roktora? <a href="#4">Create an account</a></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isOtp }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;padding:12px 24px 44px;gap:28px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.035em;line-height:1.06">Enter the code</h1>
+              <p style="margin:0;font-size:15px;color:var(--text-secondary)">Sent to <span style="color:var(--text-primary);font-weight:600">+880 {{ phoneShown }}</span> · <a href="#3" onClick="{{ backToPhone }}">Edit</a></p>
+            </div>
+            <div style="position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+              <sc-for list="{{ otpBoxes }}" as="b" hint-placeholder-count="6">
+                <div style="height:64px;border-radius:18px;background:var(--surface-1);border:{{ b.border }};box-shadow:var(--shadow-1);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:26px;font-weight:600;transition:border-color var(--dur-snap) var(--ease-snap)">{{ b.ch }}</div>
+              </sc-for>
+              <input value="{{ otp }}" onChange="{{ setOtp }}" inputMode="numeric" autoComplete="one-time-code" maxLength="6" aria-label="6-digit code" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;cursor:text">
+            </div>
+            <sc-if value="{{ otpError }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:var(--bg-danger);color:var(--text-danger);font-size:14px;font-weight:500"><i class="ti ti-alert-circle-filled" style="font-size:20px"></i><span>Enter all 6 digits, or try again in 30 seconds.</span></div>
+            </sc-if>
+            <sc-if value="{{ otpOk }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:var(--bg-success);color:var(--text-success);font-size:14px;font-weight:500"><i class="ti ti-circle-check-filled" style="font-size:20px"></i><span>Phone verified. Taking you home.</span></div>
+            </sc-if>
+            <button onClick="{{ verify }}" style="height:58px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;font-size:16px;cursor:pointer;transition:transform var(--dur-fast) var(--ease-snap)" style-active="transform:scale(.98)">Verify</button>
+            <div style="display:flex;justify-content:center"><span style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:999px;background:var(--surface-2);color:var(--text-secondary);font-size:13px;font-weight:500"><i class="ti ti-clock" style="font-size:15px"></i>Resend in 0:28</span></div>
+            <div style="margin-top:auto;display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:20px;background:var(--surface-1);border:1px solid var(--border);font-size:13px;color:var(--text-secondary)"><span style="width:32px;height:32px;flex:none;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text-primary)"><i class="ti ti-wifi-off"></i></span><span>On a weak connection? The code still works if it arrives after you lose signal.</span></div>
+          </div>
+        </sc-if>
+        <div style="position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty;padding:0 4px">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Phone + OTP first, social as a compact pair. Try Verify with fewer than 6 digits.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Modern move</span> · Six code cells over one hidden input — the look of boxes, the autofill of a single field.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Back button is always visible, even on the first step.</div>
+      </div>
+    </div>
+
+    <div id="4" style="width:390px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">04</span><span style="font-weight:600">Sign-up</span></div>
+      <div data-screen-label="04 Sign-up" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column">
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:60px;display:flex;align-items:center;gap:12px;padding:0 16px">
+          <button aria-label="Back" style="width:44px;height:44px;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)"><i class="ti ti-arrow-left"></i></button>
+        </div>
+        <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:22px;padding:8px 24px 130px">
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px">
+            <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.035em;line-height:1.06">Tell us about you</h1>
+            <p style="margin:0;font-size:15px;color:var(--text-secondary)">Four details. Takes about 30 seconds.</p>
+          </div>
+          <label style="flex-shrink:0;display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:13px;font-weight:600">Full name</span>
+            <input value="Nusrat Rahman" style="height:56px;border:1px solid var(--border-strong);border-radius:18px;background:var(--surface-1);padding:0 18px;font-size:16px;font-weight:500;outline:none" style-focus="border-color:var(--fill-brand);box-shadow:0 0 0 4px var(--bg-brand)">
+            <span style="font-size:12px;color:var(--text-muted)">Requesters only see "Nusrat R."</span>
+          </label>
+          <label style="flex-shrink:0;display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:13px;font-weight:600">Your area</span>
+            <div style="position:relative">
+              <i class="ti ti-map-pin" style="position:absolute;left:16px;top:18px;font-size:19px;color:var(--text-muted);pointer-events:none"></i>
+              <select style="width:100%;height:56px;border:1px solid var(--border-strong);border-radius:18px;background:var(--surface-1);padding:0 40px 0 46px;font-size:16px;font-weight:500;appearance:none;outline:none">
+                <option>Dhanmondi, Dhaka</option><option>Mirpur, Dhaka</option><option>Uttara, Dhaka</option><option>Agrabad, Chattogram</option>
+              </select>
+              <i class="ti ti-chevron-down" style="position:absolute;right:16px;top:19px;pointer-events:none;color:var(--text-muted)"></i>
+            </div>
+          </label>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600">Blood group</span><span style="font-size:12px;color:var(--text-muted)">{{ suHint }}</span></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <sc-for list="{{ suGroups }}" as="g" hint-placeholder-count="8">
+                <button onClick="{{ g.pick }}" style="height:64px;border-radius:18px;border:1.5px solid {{ g.bc }};background:{{ g.bg }};color:{{ g.color }};box-shadow:{{ g.shadow }};font-weight:600;font-size:18px;letter-spacing:-0.01em;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:background var(--dur-snap) var(--ease-snap),transform var(--dur-fast) var(--ease-snap)" style-active="transform:scale(.96)">{{ g.label }}</button>
+              </sc-for>
+            </div>
+            <button onClick="{{ suUnknown }}" style="height:46px;border-radius:999px;border:1.5px solid {{ suUnknownBc }};background:{{ suUnknownBg }};color:var(--text-secondary);cursor:pointer;font-size:14px;font-weight:500">I don't know yet — remind me after a test</button>
+          </div>
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:14px;padding:16px;border-radius:22px;background:var(--surface-1);border:1px solid var(--border);box-shadow:var(--shadow-1)">
+            <span style="width:42px;height:42px;flex:none;border-radius:14px;background:var(--bg-success);color:var(--text-success);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="ti ti-bell-ringing"></i></span>
+            <div style="flex:1;min-width:0"><div style="font-weight:600">Available to donate</div><div style="font-size:13px;color:var(--text-secondary)">Alerts for your group within 5 km</div></div>
+            <button onClick="{{ toggleAvail }}" aria-label="Available to donate" style="width:52px;height:32px;flex:none;border-radius:999px;border:0;padding:3px;background:{{ availTrack }};cursor:pointer;display:flex;justify-content:{{ availJustify }};transition:background var(--dur-snap) var(--ease-snap)"><span style="width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2)"></span></button>
+          </div>
+          <div style="flex-shrink:0;display:flex;gap:10px;font-size:13px;color:var(--text-secondary)"><i class="ti ti-lock" style="font-size:16px;margin-top:2px"></i><span>Your exact location and phone stay private. You choose who sees them.</span></div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:16px 24px 34px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--border)">
+          <button style="width:100%;height:58px;border:0;border-radius:999px;background:var(--fill-brand);color:var(--on-fill);font-weight:600;font-size:16px;cursor:pointer;transition:transform var(--dur-fast) var(--ease-snap)" style-active="transform:scale(.98)">Create account</button>
+        </div>
+        <div style="position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty;padding:0 4px">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Collects the minimum: name, area, blood group, availability.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Modern move</span> · Large tappable group tiles that fill solid on select; frosted sticky CTA bar.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · Area, not GPS, at sign-up — less precise matching until donors opt in.</div>
+      </div>
+    </div>
+
+    <div id="5" style="width:390px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--fill-primary);color:var(--on-primary)">05</span><span style="font-weight:600">Eligibility · step {{ wzNum }} of 5</span></div>
+      <div data-screen-label="05 Eligibility" style="width:390px;height:844px;position:relative;overflow:hidden;background:var(--surface-0);border-radius:52px;box-shadow:var(--shadow-2),0 0 0 1px var(--border);display:flex;flex-direction:column">
+        <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font-size:15px;font-weight:600"><span>9:41</span><span style="position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:999px;background:#000"></span><span style="display:flex;gap:5px;font-size:16px"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4"></i></span></div>
+        <div style="height:60px;display:flex;align-items:center;gap:12px;padding:0 16px">
+          <button onClick="{{ wzBack }}" aria-label="Back" style="width:44px;height:44px;flex:none;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)"><i class="ti ti-arrow-left"></i></button>
+          <div style="flex:1;display:flex;gap:5px">
+            <sc-for list="{{ wzBars }}" as="b" hint-placeholder-count="5">
+              <span style="flex:1;height:6px;border-radius:999px;background:{{ b.bg }};transition:background var(--dur-base) var(--ease-out)"></span>
+            </sc-for>
+          </div>
+          <button aria-label="Close" style="width:44px;height:44px;flex:none;border:1px solid var(--border);background:var(--surface-1);border-radius:50%;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)"><i class="ti ti-x"></i></button>
+        </div>
+        <sc-if value="{{ wzAsking }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;gap:24px;padding:20px 24px 24px">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="align-self:flex-start;font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--bg-brand);color:var(--text-brand)">{{ wzNum }} of 5 · {{ wzName }}</span>
+              <h1 style="margin:0;font-size:30px;font-weight:600;line-height:1.1;letter-spacing:-0.03em;text-wrap:balance">{{ wzQ }}</h1>
+              <p style="margin:0;font-size:15px;color:var(--text-secondary);text-wrap:pretty">{{ wzHint }}</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ wzOpts }}" as="o" hint-placeholder-count="2">
+                <button onClick="{{ o.pick }}" style="min-height:64px;display:flex;align-items:center;gap:14px;padding:0 18px;border-radius:20px;border:1.5px solid {{ o.bc }};background:{{ o.bg }};box-shadow:var(--shadow-1);text-align:left;cursor:pointer;font-size:16px;font-weight:500;transition:background var(--dur-snap) var(--ease-snap),border-color var(--dur-snap) var(--ease-snap)">
+                  <span style="flex:1">{{ o.label }}</span>
+                  <span style="width:26px;height:26px;flex:none;border-radius:50%;border:{{ o.ring }};background:{{ o.dot }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px"><i class="ti ti-check" style="opacity:{{ o.op }}"></i></span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ wzDefer }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:20px;background:var(--bg-warning);color:var(--text-warning);font-size:14px;font-weight:500"><i class="ti ti-clock-pause" style="font-size:20px"></i><span>{{ wzDeferText }}</span></div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ wzDone }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;gap:24px;padding:20px 24px 24px">
+            <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+              <div style="width:72px;height:72px;border-radius:24px;background:{{ resBg }};color:{{ resFg }};display:flex;align-items:center;justify-content:center;font-size:36px"><i class="ti {{ resIcon }}"></i></div>
+              <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.03em;line-height:1.1">{{ resTitle }}</h1>
+              <p style="margin:0;font-size:15px;color:var(--text-secondary);text-wrap:pretty">{{ resBody }}</p>
+            </div>
+            <div style="border-radius:22px;background:var(--surface-1);border:1px solid var(--border);box-shadow:var(--shadow-1);overflow:hidden">
+              <sc-for list="{{ wzSummary }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-top:{{ r.top }}">
+                  <i class="ti {{ r.icon }}" style="font-size:20px;color:{{ r.color }}"></i>
+                  <span style="flex:1;font-size:14px;color:var(--text-secondary)">{{ r.name }}</span>
+                  <span style="font-size:14px;font-weight:600">{{ r.answer }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted)">This is a pre-check. Staff confirm eligibility with a short exam at the hospital.</div>
+          </div>
+        </sc-if>
+        <div style="padding:16px 24px 40px">
+          <button onClick="{{ wzNext }}" disabled="{{ wzNextDisabled }}" style="width:100%;height:58px;border:0;border-radius:999px;background:{{ wzNextBg }};color:{{ wzNextFg }};font-weight:600;font-size:16px;cursor:pointer;transition:background var(--dur-snap) var(--ease-snap)">{{ wzCta }}</button>
+        </div>
+        <div style="position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--text-primary)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-secondary);text-wrap:pretty;padding:0 4px">
+        <div><span style="color:var(--text-primary);font-weight:600">Does</span> · Five one-question steps; deferrals explain the wait instead of rejecting.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Modern move</span> · Progress lives in the nav bar; answer cards with trailing check; step chip above a display question.</div>
+        <div><span style="color:var(--text-primary);font-weight:600">Trade-off</span> · One question per screen is slower for experts, clearer for first-timers.</div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: localStorage.getItem('ld-theme') || 'light', ob: 0, loginStep: 'phone', phone: '1712 345678', otp: '482', otpError: false, otpOk: false, bg: 'O−', avail: true, wz: 0, ans: [0, 1, null, null] };
+  componentDidMount() {
+    const ring = d => React.createElement('span', { key: d, style: { position: 'absolute', inset: 0, borderRadius: '50%', border: '1.5px solid rgba(255,255,255,.6)', animation: `ldPulse 2.4s ${d}s cubic-bezier(.2,.7,.2,1) infinite` } });
+    this.pulse = React.createElement('div', { style: { position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+      ring(0), ring(0.8), ring(1.6),
+      React.createElement('div', { style: { position: 'relative', width: 96, height: 96, borderRadius: 32, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 16px 40px rgba(0,0,0,.22)' } },
+        React.createElement('svg', { viewBox: '520 440 702 1040', style: { height: 54, width: 'auto', display: 'block' } }, React.createElement('path', { d: 'M875 450C855 560 880 650 960 760C1040 870 1212 980 1212 1130C1212 1320 1060 1470 875 1470C690 1470 530 1320 530 1120C530 1030 560 930 597 852C555 960 545 1080 625 1180C655 1218 680 1240 710 1240C745 1240 765 1200 745 1170C735 1150 715 1138 700 1125C640 1070 615 990 620 900C630 740 760 570 875 450Z', style: { fill: 'var(--fill-brand)' } }))));
+    this.loader = React.createElement('div', { style: { width: 140, height: 4, borderRadius: 999, background: 'rgba(255,255,255,.28)', overflow: 'hidden' } },
+      React.createElement('div', { style: { width: '40%', height: '100%', borderRadius: 999, background: '#fff', animation: 'ldSlide 1.4s cubic-bezier(.3,0,.2,1) infinite' } }));
+    this.forceUpdate();
+  }
+  renderVals() {
+    const s = this.state;
+    const obs = [
+      { title: 'Donors within walking distance', body: 'Requests reach your neighborhood first, so help can arrive on foot.' },
+      { title: 'Every hospital is checked', body: 'Hospital requests carry a verified badge. Individual requests are screened first — no fake SOS.' },
+      { title: 'From alert to donation in hours', body: 'Alerts only for your blood group and distance. Commit in one tap, then check in with a QR code.' }
+    ];
+    const groups = ['A+', 'A−', 'B+', 'B−', 'O+', 'O−', 'AB+', 'AB−'];
+    const W = [
+      { name: 'Health', q: 'Are you feeling well today?', hint: 'No fever, cold, or flu symptoms in the last 7 days.', opts: ['Yes, I feel well', 'Not today'], defer: 1, dt: "Rest up first. You can retake this check once you're feeling well." },
+      { name: 'Last donation', q: 'When did you last donate blood?', hint: 'Whole-blood donors need at least 4 months between donations.', opts: ['Never donated', 'More than 4 months ago', 'Within the last 4 months'], defer: 2, dt: "You'll be ready again 4 months after your last donation. We'll remind you." },
+      { name: 'Medication', q: 'Any antibiotics in the last 7 days?', hint: 'Most daily medicines are fine. Antibiotics need a short wait.', opts: ['No', 'Yes'], defer: 1, dt: "Wait 7 days after your last dose, then you're good to go." },
+      { name: 'Procedures', q: 'Any tattoo, piercing, or surgery in the last 6 months?', hint: 'These need a 6-month wait to keep recipients safe.', opts: ['No', 'Yes'], defer: 1, dt: 'This needs a 6-month wait. Your passport will show the date.' },
+      { name: 'Confirm' }
+    ];
+    const cur = W[s.wz];
+    const asking = s.wz < 4;
+    const a = s.ans[s.wz];
+    const deferred = s.ans.some((v, i) => v === W[i].defer);
+    const setAns = (i, v) => { const n = s.ans.slice(); n[i] = v; this.setState({ ans: n }); };
+    const nextDisabled = asking && a == null;
+    return {
+      theme: s.theme, themeLabel: s.theme === 'dark' ? 'Light' : 'Dark', themeIcon: s.theme === 'dark' ? 'ti-sun' : 'ti-moon',
+      toggleTheme: () => { const t = s.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('ld-theme', t); this.setState({ theme: t }); },
+      pulse: this.pulse || null, loader: this.loader || null,
+      obIndex: s.ob + 1, ob: obs[s.ob], obIs0: s.ob === 0, obIs1: s.ob === 1, obIs2: s.ob === 2,
+      obDots: obs.map((_, i) => ({ go: () => this.setState({ ob: i }), w: i === s.ob ? 28 : 8, bg: i === s.ob ? 'var(--fill-brand)' : 'var(--border-strong)' })),
+      obNext: () => this.setState({ ob: (s.ob + 1) % 3 }), obSkip: () => this.setState({ ob: 2 }),
+      obCta: s.ob === 2 ? 'Get started' : 'Next',
+      isPhone: s.loginStep === 'phone', isOtp: s.loginStep === 'otp', loginStepName: s.loginStep === 'phone' ? 'phone' : 'code',
+      phone: s.phone, phoneShown: s.phone || '—', setPhone: e => this.setState({ phone: e.target.value }),
+      sendCode: () => this.setState({ loginStep: 'otp', otpError: false, otpOk: false }),
+      backToPhone: () => this.setState({ loginStep: 'phone' }),
+      otp: s.otp, setOtp: e => this.setState({ otp: e.target.value.replace(/\D/g, '').slice(0, 6), otpError: false, otpOk: false }),
+      otpBoxes: Array.from({ length: 6 }, (_, i) => {
+        const ch = s.otp[i] || '';
+        const active = i === s.otp.length;
+        const border = s.otpError ? '1.5px solid var(--border-danger)' : s.otpOk ? '1.5px solid var(--border-success)' : active ? '2px solid var(--fill-brand)' : ch ? '1.5px solid var(--border-stronger)' : '1.5px solid var(--border)';
+        return { ch, border };
+      }),
+      otpError: s.otpError, otpOk: s.otpOk,
+      verify: () => this.setState(s.otp.length === 6 ? { otpOk: true, otpError: false } : { otpError: true, otpOk: false }),
+      suGroups: groups.map(g => { const on = g === s.bg; return { label: g, pick: () => this.setState({ bg: g }), bc: on ? 'var(--fill-brand)' : 'var(--border)', bg: on ? 'var(--fill-brand)' : 'var(--surface-1)', color: on ? 'var(--on-fill)' : 'var(--text-primary)', shadow: on ? '0 8px 20px -6px rgba(212,42,64,.5)' : 'var(--shadow-1)' }; }),
+      suHint: s.bg ? `${s.bg} selected` : 'Not set',
+      suUnknown: () => this.setState({ bg: null }),
+      suUnknownBc: s.bg ? 'var(--border)' : 'var(--fill-brand)',
+      suUnknownBg: s.bg ? 'transparent' : 'var(--bg-brand)',
+      toggleAvail: () => this.setState({ avail: !s.avail }),
+      availTrack: s.avail ? 'var(--fill-success)' : 'var(--border-strong)', availJustify: s.avail ? 'flex-end' : 'flex-start',
+      wzNum: s.wz + 1, wzName: cur.name,
+      wzBars: W.map((_, i) => ({ bg: i <= s.wz ? 'var(--fill-brand)' : 'var(--progress-track)' })),
+      wzAsking: asking, wzDone: !asking,
+      wzQ: cur.q, wzHint: cur.hint,
+      wzOpts: asking ? cur.opts.map((o, i) => { const on = a === i; return { label: o, pick: () => setAns(s.wz, i), bc: on ? 'var(--fill-brand)' : 'var(--border)', bg: on ? 'var(--bg-brand)' : 'var(--surface-1)', ring: on ? '0' : '1.5px solid var(--border-stronger)', dot: on ? 'var(--fill-brand)' : 'transparent', op: on ? 1 : 0 }; }) : [],
+      wzDefer: asking && a != null && a === cur.defer, wzDeferText: cur.dt,
+      resTitle: deferred ? "You can't donate just yet" : "You're eligible to donate",
+      resBody: deferred ? "Nothing's wrong — some answers need a short wait. Your passport shows when you're ready." : 'Your passport is updated. Requests for your blood group nearby will now reach you.',
+      resIcon: deferred ? 'ti-clock-pause' : 'ti-check', resBg: deferred ? 'var(--bg-warning)' : 'var(--bg-success)', resFg: deferred ? 'var(--text-warning)' : 'var(--text-success)',
+      wzSummary: W.slice(0, 4).map((w, i) => { const v = s.ans[i]; const d = v === w.defer; return { name: w.name, answer: v == null ? '—' : w.opts[v], icon: d ? 'ti-clock-pause' : 'ti-circle-check-filled', color: d ? 'var(--text-warning)' : 'var(--text-success)', top: i ? '1px solid var(--border)' : '0' }; }),
+      wzNext: () => this.setState({ wz: s.wz < 4 ? s.wz + 1 : 0, ans: s.wz < 4 ? s.ans : [null, null, null, null] }),
+      wzBack: () => this.setState({ wz: Math.max(0, s.wz - 1) }),
+      wzNextDisabled: nextDisabled,
+      wzNextBg: nextDisabled ? 'var(--surface-2)' : 'var(--fill-brand)', wzNextFg: nextDisabled ? 'var(--text-disabled)' : 'var(--on-fill)',
+      wzCta: asking ? (s.wz === 3 ? 'See result' : 'Continue') : 'Save to passport'
+    };
+  }
+}
+</script>
+</body>
+</html>
