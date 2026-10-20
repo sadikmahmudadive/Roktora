@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../core/permissions/permissions.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/motion.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/models.dart';
 import '../../data/providers.dart';
+import '../../data/repository.dart' show RoktoraRepository;
+import '../location/location_picker.dart';
 import '../home/shell_home.dart';
 
 class RequestDetailScreen extends ConsumerWidget {
@@ -29,6 +31,8 @@ class RequestDetailScreen extends ConsumerWidget {
       );
     }
     final mine = r.committedUids.contains(repo.uid);
+    final owner = r.isMine(repo.uid);
+    final closed = !r.isOpen;
     final critical = r.urgency == Urgency.critical;
     final stripBg = critical ? c.bgDanger : r.urgency == Urgency.urgent ? c.bgWarning : c.surface2;
     final stripFg = urgencyText(c, r.urgency);
@@ -42,13 +46,22 @@ class RequestDetailScreen extends ConsumerWidget {
             child: Row(children: [
               CircleIconButton(icon: TablerIcons.arrow_left, label: 'Back', onPressed: () => context.pop()),
               const Spacer(),
-              CircleIconButton(icon: TablerIcons.share, label: 'Share', onPressed: () {}),
+              CircleIconButton(icon: TablerIcons.share, label: 'Share', onPressed: () => _share(r)),
               const SizedBox(width: 4),
-              CircleIconButton(icon: TablerIcons.flag, label: 'Report', onPressed: () => _report(context)),
+              if (!owner) CircleIconButton(icon: TablerIcons.flag, label: 'Report', onPressed: () => _report(context, repo, r.id)),
             ]),
           ),
           Expanded(
             child: ListView(padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), children: [
+              if (closed) ...[
+                InfoBanner(
+                  r.status == 'fulfilled' ? 'This request was fulfilled. Thank you to everyone who helped.' : 'The requester closed this request.',
+                  icon: r.status == 'fulfilled' ? TablerIcons.circle_check : TablerIcons.lock,
+                  bg: r.status == 'fulfilled' ? c.bgSuccess : c.surface2,
+                  fg: r.status == 'fulfilled' ? c.textSuccess : c.textSecondary,
+                ),
+                const SizedBox(height: 12),
+              ],
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: stripBg, borderRadius: BorderRadius.circular(RRadius.base)),
@@ -121,13 +134,27 @@ class RequestDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             decoration: BoxDecoration(border: Border(top: BorderSide(color: c.border)), color: c.surface0),
             child: Row(children: [
-              CircleIconButton(icon: TablerIcons.message_circle, size: 52, label: 'Message requester', filled: false, onPressed: () => context.push('/chat/${r.id}')),
+              CircleIconButton(icon: TablerIcons.message_circle, size: 52, label: owner ? 'Chat with donors' : 'Message requester', filled: false, onPressed: () => context.push('/chat/${r.id}')),
               const SizedBox(width: 8),
               Expanded(
-                child: PillButton(mine ? 'Cancel commitment' : 'Commit to donate', height: 52, outlined: mine, danger: mine, onPressed: () async {
-                  await repo.setCommitment(r.id, !mine);
-                  if (!mine && context.mounted) context.push('/consent/${r.id}');
-                }),
+                child: owner
+                    ? (closed
+                        ? PillButton('Reopen request', height: 52, outlined: true, onPressed: () => repo.setRequestStatus(r.id, 'open'))
+                        : Row(children: [
+                            Expanded(child: PillButton('Close', height: 52, outlined: true, onPressed: () => _confirmStatus(context, repo, r, 'closed'))),
+                            const SizedBox(width: 8),
+                            Expanded(flex: 2, child: PillButton('Mark fulfilled', height: 52, onPressed: () => _confirmStatus(context, repo, r, 'fulfilled'))),
+                          ]))
+                    : PillButton(
+                        closed ? 'No longer needed' : (mine ? 'Cancel commitment' : 'Commit to donate'),
+                        height: 52, outlined: mine, danger: mine,
+                        onPressed: closed
+                            ? null
+                            : () async {
+                                await repo.setCommitment(r.id, !mine);
+                                if (!mine && context.mounted) context.push('/consent/${r.id}');
+                              },
+                      ),
               ),
             ]),
           ),
@@ -136,17 +163,65 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _report(BuildContext context) => showModalBottomSheet(
+  void _share(BloodRequest r) {
+    final when = DateFormat('d MMM, h:mm a').format(r.deadline);
+    SharePlus.instance.share(ShareParams(
+      text: 'Blood needed (${r.bloodGroup}): ${r.title} at ${r.place}. Needed by $when. Can you help? Find it on Roktora.',
+      subject: 'Blood needed: ${r.bloodGroup}',
+    ));
+  }
+
+  Future<void> _confirmStatus(BuildContext context, RoktoraRepository repo, BloodRequest r, String status) async {
+    final fulfilled = status == 'fulfilled';
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(fulfilled ? 'Mark as fulfilled?' : 'Close this request?'),
+        content: Text(fulfilled
+            ? 'Donors will see that the blood was received and stop getting alerts for it.'
+            : 'It will disappear from the map and feed. You can reopen it later.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Not yet')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(fulfilled ? 'Mark fulfilled' : 'Close request')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await repo.setRequestStatus(r.id, status);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 92), // sits above the action bar so it never blocks it
+        content: Text(fulfilled ? 'Marked as fulfilled.' : 'Request closed.'),
+      ));
+    }
+  }
+
+  void _report(BuildContext context, RoktoraRepository repo, String requestId) => showModalBottomSheet(
         context: context,
         backgroundColor: context.rc.surface3,
-        builder: (_) => SafeArea(
+        builder: (sheet) => SafeArea(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Padding(padding: EdgeInsets.fromLTRB(16, 16, 16, 4), child: Align(alignment: Alignment.centerLeft, child: Text('Report this request', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)))),
             for (final reason in ['Asked for money', 'Looks fake or duplicate', 'Wrong details'])
               ListTile(
                 title: Text(reason),
-                onTap: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thanks. Our team will review this request.')));
+                onTap: () async {
+                  Navigator.pop(sheet);
+                  String msg;
+                  try {
+                    await repo.reportRequest(requestId, reason);
+                    msg = 'Thanks. Our team will review this request.';
+                  } catch (_) {
+                    msg = "Couldn't send the report. Check your connection and try again.";
+                  }
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 92),
+                      content: Text(msg),
+                    ));
+                  }
                 },
               ),
           ]),
@@ -311,12 +386,15 @@ class ChatsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uid = ref.read(repositoryProvider).uid;
-    final mine = (ref.watch(requestsProvider).value ?? const <BloodRequest>[]).where((r) => r.committedUids.contains(uid)).toList();
+    final committed = (ref.watch(requestsProvider).value ?? const <BloodRequest>[]).where((r) => r.committedUids.contains(uid));
+    final posted = ref.watch(myRequestsProvider).value ?? const <BloodRequest>[];
+    // Threads for requests you committed to and requests you posted, without duplicates.
+    final mine = {for (final r in [...committed, ...posted]) r.id: r}.values.toList();
     return SafeArea(
       child: ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, kNavClearance), children: [
         Padding(padding: const EdgeInsets.only(left: 4, bottom: 16), child: Text('Chats', style: AppTheme.display(context, size: 26))),
         if (mine.isEmpty)
-          const SurfaceCard(child: EmptyState(icon: TablerIcons.message_circle, title: 'No chats yet', message: 'Commit to a request and its chat shows up here.'))
+          const SurfaceCard(child: EmptyState(icon: TablerIcons.message_circle, title: 'No chats yet', message: 'Commit to a request, or post one, and its chat shows up here.'))
         else
           SurfaceCard(
             padding: EdgeInsets.zero,
@@ -365,23 +443,41 @@ class _PostRequestScreenState extends ConsumerState<PostRequestScreen> {
   int _bags = 1;
   Urgency _urgency = Urgency.urgent;
   bool _busy = false;
+  PickedLocation? _where;
 
-  bool get _valid => _title.text.trim().length > 3 && _place.text.trim().length > 2;
+  bool get _valid => _title.text.trim().length > 3 && _place.text.trim().length > 2 && _where != null;
+
+  Future<void> _pickPlace() async {
+    final r = await pickLocation(
+      context,
+      title: 'Where is the blood needed?',
+      confirmLabel: 'Use this location',
+      initial: _where?.latLng,
+      hint: 'Move the map to the hospital or ward entrance. Donors use this to find you and get directions.',
+    );
+    if (r == null || !mounted) return;
+    setState(() {
+      _where = r;
+      if (_place.text.trim().isEmpty) _place.text = r.label.split(',').first;
+    });
+  }
 
   Future<void> _post() async {
     final repo = ref.read(repositoryProvider);
     final name = ref.read(profileProvider).value?.publicName ?? '';
-    final here = ref.read(userLocationProvider).value;
-    double? near(double? v) => v == null ? null : (v * 1000).round() / 1000; // ~110 m
     setState(() => _busy = true);
     final hours = switch (_urgency) { Urgency.critical => 6, Urgency.urgent => 24, Urgency.routine => 72 };
     await repo.postRequest(BloodRequest(
       id: '', bloodGroup: _group, title: _title.text.trim(), place: _place.text.trim(), distanceKm: 0, bagsNeeded: _bags, committed: 0,
       urgency: _urgency, deadline: DateTime.now().add(Duration(hours: hours)), postedBy: name,
-      lat: near(here?.lat), lng: near(here?.lng),
+      lat: _where!.lat, lng: _where!.lng,
     ));
     if (mounted) {
-      context.pop();
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go('/home');
+      }
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request posted. We screen individual requests before alerting donors.')));
     }
   }
@@ -411,6 +507,8 @@ class _PostRequestScreenState extends ConsumerState<PostRequestScreen> {
               const Text('Hospital or place', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(controller: _place, onChanged: (_) => setState(() {}), decoration: _dec(c, 'e.g. Dhanmondi General')),
+              const SizedBox(height: 10),
+              LocationField(label: _where?.label, placeholder: 'Pin the location on the map', onTap: _pickPlace, error: false),
               const SizedBox(height: 18),
               const Text('Blood group', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),

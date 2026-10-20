@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/notifications/push.dart';
+import 'features/admin/admin_providers.dart';
+import 'features/admin/admin_repository.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/tokens.dart';
 import 'data/providers.dart';
@@ -32,7 +34,13 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [repositoryProvider.overrideWithValue(repo)],
+      overrides: [
+        repositoryProvider.overrideWithValue(repo),
+        // Hospital dashboard backend follows the main one: real Firestore, or the seeded demo.
+        adminRepositoryProvider.overrideWithValue(
+          repo is DemoRepository ? DemoAdminRepository(main: repo) : FirebaseAdminRepository(),
+        ),
+      ],
       child: const RoktoraApp(),
     ),
   );
@@ -51,9 +59,19 @@ class RoktoraApp extends ConsumerWidget {
       themeMode: ref.watch(themeModeProvider),
       scaffoldMessengerKey: rootMessengerKey,
       routerConfig: ref.watch(routerProvider),
-      builder: (context, child) => AppBootstrap(
-        child: ResponsiveFrame(child: child ?? const SizedBox.shrink()),
-      ),
+      builder: (context, child) {
+        final router = ref.watch(routerProvider);
+        return AppBootstrap(
+          child: ListenableBuilder(
+            listenable: router.routeInformationProvider,
+            builder: (context, _) {
+              // The hospital dashboard needs the full window; donor screens stay phone-width.
+              final wide = router.routeInformationProvider.value.uri.path.startsWith('/admin');
+              return ResponsiveFrame(wide: wide, child: child ?? const SizedBox.shrink());
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -61,8 +79,11 @@ class RoktoraApp extends ConsumerWidget {
 /// Keeps the phone-sized layouts centered on wide screens (foldables, tablets,
 /// landscape) instead of stretching them edge to edge, and caps text scaling.
 class ResponsiveFrame extends StatelessWidget {
-  const ResponsiveFrame({super.key, required this.child});
+  const ResponsiveFrame({super.key, required this.child, this.wide = false});
   final Widget child;
+
+  /// Skips the phone-width cap (hospital dashboard).
+  final bool wide;
 
   static const double maxWidth = 480;
 
@@ -85,7 +106,7 @@ class ResponsiveFrame extends StatelessWidget {
         color: c.surface0,
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: maxWidth),
+            constraints: BoxConstraints(maxWidth: wide ? double.infinity : maxWidth),
             child: MediaQuery(
               data: mq.copyWith(
                 textScaler: mq.textScaler.clamp(

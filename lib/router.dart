@@ -3,19 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'data/providers.dart';
+import 'features/admin/admin_checkin.dart';
+import 'features/admin/admin_donors_reports.dart';
+import 'features/admin/admin_inventory.dart';
+import 'features/admin/admin_overview.dart';
+import 'features/admin/admin_profile.dart';
+import 'features/admin/admin_requests.dart';
+import 'features/admin/admin_shell.dart';
 import 'features/auth/login_screen.dart';
+import 'features/inbox/inbox_screen.dart';
 import 'features/auth/signup_eligibility.dart';
 import 'features/auth/splash_onboarding.dart';
 import 'features/home/shell_home.dart';
+import 'features/location/location_picker.dart';
 import 'features/permissions/permissions_screen.dart';
+import 'features/profile/edit_profile.dart';
 import 'features/profile/post_donation.dart';
 import 'features/profile/profile_settings.dart';
 import 'features/requests/map_screen.dart';
 import 'features/requests/request_screens.dart';
 
 /// Fade + gentle horizontal slide used for all pushed screens.
-CustomTransitionPage<void> _page(GoRouterState state, Widget child) =>
-    CustomTransitionPage<void>(
+CustomTransitionPage<T> _page<T>(GoRouterState state, Widget child) =>
+    CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
       transitionDuration: const Duration(milliseconds: 280),
@@ -60,7 +70,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final profile = ref.read(profileProvider);
       if (profile.isLoading) return null;
       final hasProfile = profile.value != null;
-      if (!hasProfile) return loc == '/signup' ? null : '/signup';
+      // The map picker is part of sign-up, so it must stay reachable before a profile exists.
+      if (!hasProfile) return (loc == '/signup' || loc == '/pick-location' || loc.startsWith('/admin')) ? null : '/signup';
       return _public.contains(loc) ? '/home' : null;
     },
     routes: [
@@ -82,8 +93,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, s) => _page(s, const EligibilityScreen()),
       ),
       GoRoute(
+        path: '/pick-location',
+        pageBuilder: (_, s) => _page<PickedLocation>(s, LocationPickerScreen(args: s.extra is PickerArgs ? s.extra as PickerArgs : const PickerArgs())),
+      ),
+      GoRoute(
         path: '/permissions',
         pageBuilder: (_, s) => _page(s, const PermissionsScreen()),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        pageBuilder: (_, s) => _page(s, const EditProfileScreen()),
       ),
       GoRoute(
         path: '/settings',
@@ -116,6 +135,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/thanks',
         pageBuilder: (_, s) => _page(s, const ThankYouScreen()),
+      ),
+      GoRoute(
+        path: '/inbox',
+        pageBuilder: (_, s) => _page(s, const InboxScreen()),
+      ),
+      // Hospital dashboard: a sidebar shell over seven screens.
+      ShellRoute(
+        builder: (_, state, child) => AdminShell(location: state.uri.path, child: child),
+        routes: [
+          GoRoute(path: '/admin', builder: (_, _) => const AdminOverviewScreen()),
+          GoRoute(path: '/admin/inventory', builder: (_, _) => const AdminInventoryScreen()),
+          GoRoute(path: '/admin/requests', builder: (_, s) => AdminRequestsScreen(selectedId: s.uri.queryParameters['id'])),
+          GoRoute(path: '/admin/checkin', builder: (_, _) => const AdminCheckInScreen()),
+          GoRoute(path: '/admin/donors', builder: (_, _) => const AdminDonorsScreen()),
+          GoRoute(path: '/admin/reports', builder: (_, _) => const AdminReportsScreen()),
+          GoRoute(path: '/admin/profile', builder: (_, _) => const AdminProfileScreen()),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => AppShell(shell: shell),

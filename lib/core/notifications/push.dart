@@ -25,7 +25,7 @@ class AppBootstrap extends ConsumerStatefulWidget {
 
 class _AppBootstrapState extends ConsumerState<AppBootstrap> with WidgetsBindingObserver {
   String? _tokenUid;
-  String? _locationUid;
+  String? _locationKey;
   bool _listening = false;
 
   @override
@@ -93,15 +93,14 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> with WidgetsBinding
     if (id is String && id.isNotEmpty) ref.read(routerProvider).go('/request/$id');
   }
 
-  Future<void> _syncLocation(String uid) async {
-    if (_locationUid == uid) return;
-    final pos = await ref.read(permissionApiProvider).currentPosition();
-    if (pos == null) return;
-    _locationUid = uid;
+  /// Publishes the location the user set on the map, rounded to ~1 km. It's re-sent only when it changes.
+  Future<void> _syncLocation(String uid, double lat, double lng) async {
+    final key = '$uid|${coarse(lat)}|${coarse(lng)}';
+    if (_locationKey == key) return;
+    _locationKey = key; // set first so a failing write (e.g. rules not deployed) isn't retried on every rebuild
     try {
-      await ref.read(repositoryProvider).saveApproxLocation(coarse(pos.lat), coarse(pos.lng));
+      await ref.read(repositoryProvider).saveApproxLocation(coarse(lat), coarse(lng));
     } catch (e) {
-      // Keep _locationUid set so a failing write (e.g. rules not deployed yet) isn't retried on every rebuild.
       debugPrint('saving approximate location failed: $e');
     }
   }
@@ -110,17 +109,19 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> with WidgetsBinding
   Widget build(BuildContext context) {
     final uid = ref.watch(authProvider).value;
     final perms = ref.watch(permissionsProvider).value;
+    final profile = ref.watch(profileProvider).value;
     final showOnMap = ref.watch(prefsProvider)['showOnMap'] ?? true;
 
     if (uid == null) {
       _tokenUid = null;
-      _locationUid = null;
-    } else if (perms != null) {
-      if (ref.read(messagingAvailableProvider) && perms.notifications == PermStatus.granted) {
+      _locationKey = null;
+    } else {
+      if (perms != null && ref.read(messagingAvailableProvider) && perms.notifications == PermStatus.granted) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _registerPush(uid));
       }
-      if (perms.location == PermStatus.granted && showOnMap) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _syncLocation(uid));
+      // Location comes from the map the user pinned, not from the phone's GPS.
+      if (profile != null && profile.hasLocation && showOnMap) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _syncLocation(uid, profile.lat!, profile.lng!));
       }
     }
     return widget.child;

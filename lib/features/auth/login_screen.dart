@@ -6,10 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/auth_errors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/providers.dart';
+import 'email_auth_form.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -23,6 +25,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _otpFocus = FocusNode();
   String? _verificationId;
   bool _busy = false;
+  bool _email = false; // false = phone, true = email + password
+  bool _googleBusy = false;
   String? _error;
   int _resend = 0;
   Timer? _timer;
@@ -146,7 +150,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: _otpStep ? _otpBody(c) : _phoneBody(c),
+                    child: _otpStep ? _otpBody(c) : _entryBody(c),
                   ),
                 ]),
               ),
@@ -155,6 +159,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _google() async {
+    setState(() {
+      _googleBusy = true;
+      _error = null;
+    });
+    try {
+      await ref.read(repositoryProvider).signInWithGoogle();
+    } catch (e) {
+      debugPrint('google sign-in failed: $e');
+      final msg = authErrorMessage(e, fallback: "Google sign-in didn't work. Try again or use another method.");
+      if (mounted && msg.isNotEmpty) setState(() => _error = msg);
+    } finally {
+      if (mounted) setState(() => _googleBusy = false);
+    }
+  }
+
+  /// Phone or email entry, plus Google.
+  Widget _entryBody(RColors c) {
+    Widget tab(bool email, String label, IconData icon) => Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() {
+              _email = email;
+              _error = null;
+            }),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              height: 42,
+              decoration: BoxDecoration(
+                color: _email == email ? c.surface1 : Colors.transparent,
+                borderRadius: BorderRadius.circular(99),
+                border: _email == email ? Border.all(color: c.border) : null,
+              ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(icon, size: 17, color: _email == email ? c.textPrimary : c.textSecondary),
+                const SizedBox(width: 8),
+                Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: _email == email ? c.textPrimary : c.textSecondary)),
+              ]),
+            ),
+          ),
+        );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(color: c.surface2, borderRadius: BorderRadius.circular(99)),
+        child: Row(children: [tab(false, 'Phone', TablerIcons.device_mobile), tab(true, 'Email', TablerIcons.mail)]),
+      ),
+      const SizedBox(height: 24),
+      if (_email) const EmailAuthForm() else _phoneBody(c),
+      const SizedBox(height: 24),
+      Row(children: [
+        Expanded(child: Divider(color: c.border)),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text('or continue with', style: TextStyle(fontSize: 13, color: c.textMuted))),
+        Expanded(child: Divider(color: c.border)),
+      ]),
+      const SizedBox(height: 16),
+      SizedBox(
+        height: 54,
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: _googleBusy ? null : _google,
+          icon: _googleBusy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(TablerIcons.brand_google_filled, size: 19),
+          label: Text(_googleBusy ? 'Opening Google…' : 'Google', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+          style: OutlinedButton.styleFrom(shape: const StadiumBorder(), foregroundColor: c.textPrimary, side: BorderSide(color: c.borderStrong), backgroundColor: c.surface1),
+        ),
+      ),
+      if (_error != null && _email) ...[const SizedBox(height: 12), InfoBanner(_error!, icon: TablerIcons.alert_circle_filled, bg: c.bgDanger, fg: c.textDanger)],
+    ]);
   }
 
   Widget _phoneBody(RColors c) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -188,12 +261,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (_error != null) ...[const SizedBox(height: 16), InfoBanner(_error!, icon: TablerIcons.alert_circle_filled, bg: c.bgDanger, fg: c.textDanger)],
         const SizedBox(height: 28),
         PillButton(_busy ? 'Sending…' : 'Send code', onPressed: _busy ? null : _send),
-        const SizedBox(height: 32),
-        Row(children: [
-          Expanded(child: Divider(color: c.border)),
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text('Phone sign-in keeps donor accounts verified', style: TextStyle(fontSize: 13, color: c.textMuted))),
-          Expanded(child: Divider(color: c.border)),
-        ]),
       ]);
 
   Widget _otpBody(RColors c) {

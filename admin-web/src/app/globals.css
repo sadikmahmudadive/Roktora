@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* Roktora design tokens, ported 1:1 from the mobile app so both surfaces look alike. */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --surface-0: #f3f2ef;
+  --surface-1: #ffffff;
+  --surface-2: #eae8e3;
+  --surface-3: #ffffff;
+  --ink: #141413;
+  --ink-2: #55534d;
+  --ink-3: #76736c;
+  --ink-4: #b3b0a8;
+  --line: rgba(20, 20, 19, 0.1);
+  --line-2: rgba(20, 20, 19, 0.2);
+  --line-3: rgba(20, 20, 19, 0.4);
+  --brand: #d42a40;
+  --brand-ink: #b01a30;
+  --brand-bg: #fde8ea;
+  --accent: #2f6fd1;
+  --accent-ink: #1d5fbf;
+  --accent-bg: #e6eefb;
+  --danger: #c8321f;
+  --danger-ink: #b3261e;
+  --danger-bg: #fce9e6;
+  --success: #22995a;
+  --success-ink: #1b6b3c;
+  --success-bg: #e2f3e8;
+  --warning: #b97c0c;
+  --warning-ink: #7f4c00;
+  --warning-bg: #fcf0d8;
+  --primary: #141413;
+  --on-primary: #f7f6f3;
+  --on-fill: #ffffff;
+  --track: rgba(20, 20, 19, 0.08);
+  --hover: rgba(20, 20, 19, 0.04);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211;
+  --surface-1: #1d1c1b;
+  --surface-2: #282725;
+  --surface-3: #323130;
+  --ink: #f4f2ec;
+  --ink-2: #c2bfb7;
+  --ink-3: #9a978f;
+  --ink-4: #5f5d58;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-2: rgba(255, 255, 255, 0.18);
+  --line-3: rgba(255, 255, 255, 0.36);
+  --brand: #e5384e;
+  --brand-ink: #ff9aa7;
+  --brand-bg: #3b171d;
+  --accent: #3d7ddb;
+  --accent-ink: #8fb5f3;
+  --accent-bg: #1b2740;
+  --danger: #cf4632;
+  --danger-ink: #f2a093;
+  --danger-bg: #3a1f1b;
+  --success: #2f9f5f;
+  --success-ink: #8dd3a5;
+  --success-bg: #18301f;
+  --warning: #b57f14;
+  --warning-ink: #ecc679;
+  --warning-bg: #382c15;
+  --primary: #f4f2ec;
+  --on-primary: #121211;
+  --track: rgba(255, 255, 255, 0.1);
+  --hover: rgba(255, 255, 255, 0.05);
+}
+
+/* Follow the OS until the user picks a theme (data-theme is set by the toggle). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #121211;
+    --surface-1: #1d1c1b;
+    --surface-2: #282725;
+    --surface-3: #323130;
+    --ink: #f4f2ec;
+    --ink-2: #c2bfb7;
+    --ink-3: #9a978f;
+    --ink-4: #5f5d58;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-2: rgba(255, 255, 255, 0.18);
+    --line-3: rgba(255, 255, 255, 0.36);
+    --brand: #e5384e;
+    --brand-ink: #ff9aa7;
+    --brand-bg: #3b171d;
+    --accent: #3d7ddb;
+    --accent-ink: #8fb5f3;
+    --accent-bg: #1b2740;
+    --danger: #cf4632;
+    --danger-ink: #f2a093;
+    --danger-bg: #3a1f1b;
+    --success: #2f9f5f;
+    --success-ink: #8dd3a5;
+    --success-bg: #18301f;
+    --warning: #b57f14;
+    --warning-ink: #ecc679;
+    --warning-bg: #382c15;
+    --primary: #f4f2ec;
+    --on-primary: #121211;
+    --track: rgba(255, 255, 255, 0.1);
+    --hover: rgba(255, 255, 255, 0.05);
+  }
+}
+
+@theme inline {
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-line-3: var(--line-3);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-bg: var(--brand-bg);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-bg: var(--accent-bg);
+  --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
+  --color-danger-bg: var(--danger-bg);
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-ink: var(--warning-ink);
+  --color-warning-bg: var(--warning-bg);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-on-fill: var(--on-fill);
+  --color-track: var(--track);
+  --color-hover: var(--hover);
+  --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --radius-card: 24px;
+  --radius-ctl: 14px;
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

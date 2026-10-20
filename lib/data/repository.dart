@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../features/admin/admin_models.dart' show InboxMessage;
 import 'models.dart';
 
 /// Backend contract. [FirebaseRepository] is the real thing; [DemoRepository]
@@ -15,6 +16,14 @@ abstract class RoktoraRepository {
   Future<void> verifyCode(String verificationId, String code);
   Future<void> signOut();
 
+  /// Email + password sign-in (alongside phone and Google).
+  Future<void> signInWithEmail(String email, String password);
+  Future<void> createAccountWithEmail(String email, String password);
+  Future<void> sendPasswordReset(String email);
+
+  /// Google sign-in through Firebase's OAuth flow (no extra native SDK).
+  Future<void> signInWithGoogle();
+
   Stream<DonorProfile?> profile();
   Future<void> saveProfile(DonorProfile p);
   Future<void> setAvailable(bool v);
@@ -23,6 +32,23 @@ abstract class RoktoraRepository {
   Stream<BloodRequest?> request(String id);
   Future<void> setCommitment(String requestId, bool committed);
   Future<void> postRequest(BloodRequest r);
+
+  /// Requests the signed-in user posted, newest first (any status).
+  Stream<List<BloodRequest>> myRequests();
+
+  /// Poster-only: mark a request 'fulfilled' or 'closed' (or reopen with 'open').
+  Future<void> setRequestStatus(String id, String status);
+
+  /// Flags a request for the moderation team.
+  Future<void> reportRequest(String requestId, String reason);
+
+  /// Messages hospitals sent to this donor, newest first.
+  Stream<List<InboxMessage>> inbox();
+  Future<void> markInboxRead(String id);
+
+  /// Removes the profile, donation history and sign-in. Throws `requires-recent-login` if the
+  /// sign-in is too old.
+  Future<void> deleteAccount();
 
   /// Donors near ([lat], [lng]) when known; distances are 0 for donors who haven't shared a location.
   Future<List<NearbyDonor>> nearbyDonors({double? lat, double? lng});
@@ -53,7 +79,32 @@ class FirebaseRepository implements RoktoraRepository {
   String? get uid => _auth.currentUser?.uid;
 
   @override
-  Stream<String?> authChanges() => _auth.authStateChanges().map((u) => u?.uid);
+  Stream<String?> authChanges() => _auth.authStateChanges().asyncMap((u) async {
+        if (u != null) await _recordAccount(u);
+        return u?.uid;
+      });
+
+  /// Stores/refreshes accounts/{uid}. New accounts get role "user"; only the console can change
+  /// `role` / `hospitalId` (the rules reject client writes to them). Never blocks sign-in.
+  Future<void> _recordAccount(User u) async {
+    try {
+      final ref = _db.collection('accounts').doc(u.uid);
+      final info = <String, dynamic>{
+        'email': u.email,
+        'phone': u.phoneNumber,
+        'displayName': u.displayName,
+        'photoURL': u.photoURL,
+        'providers': [for (final p in u.providerData) p.providerId],
+        'lastLoginAt': FieldValue.serverTimestamp(),
+      };
+      final snap = await ref.get();
+      if (snap.exists) {
+        await ref.update(info);
+      } else {
+        await ref.set({...info, 'role': 'user', 'createdAt': FieldValue.serverTimestamp()});
+      }
+    } catch (_) {}
+  }
 
   @override
   Future<String> sendCode(String e164Phone) {
@@ -81,6 +132,28 @@ class FirebaseRepository implements RoktoraRepository {
   @override
   Future<void> signOut() => _auth.signOut();
 
+  @override
+  Future<void> signInWithEmail(String email, String password) =>
+      _auth.signInWithEmailAndPassword(email: email.trim(), password: password);
+
+  @override
+  Future<void> createAccountWithEmail(String email, String password) async {
+    final cred = await _auth.createUserWithEmailAndPassword(email: email.trim(), password: password);
+    try {
+      await cred.user?.sendEmailVerification();
+    } catch (_) {
+      // Verification mail is a courtesy; the account exists either way.
+    }
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) => _auth.sendPasswordResetEmail(email: email.trim());
+
+  @override
+  Future<void> signInWithGoogle() async {
+    await _auth.signInWithProvider(GoogleAuthProvider()..addScope('email'));
+  }
+
   DocumentReference<Map<String, dynamic>> get _me => _db.collection('users').doc(uid);
 
   @override
@@ -102,15 +175,17 @@ class FirebaseRepository implements RoktoraRepository {
         'publicName': p.publicName,
         'bloodGroup': p.bloodGroup,
         'area': p.area,
-        'available': p.available && p.eligible,
+        'available': p.available && p.isEligibleNow,
         'donations': p.donations,
       };
 
   @override
   Future<void> setAvailable(bool v) async {
+    final snap = await _me.get();
+    final eligible = snap.exists ? DonorProfile.fromMap(uid!, snap.data()!).isEligibleNow : true;
     final batch = _db.batch();
     batch.update(_me, {'available': v});
-    batch.set(_db.collection('donors').doc(uid), {'available': v}, SetOptions(merge: true));
+    batch.set(_db.collection('donors').doc(uid), {'available': v && eligible}, SetOptions(merge: true));
     await batch.commit();
   }
 
@@ -120,7 +195,7 @@ class FirebaseRepository implements RoktoraRepository {
       .where('deadline', isGreaterThan: Timestamp.now())
       .orderBy('deadline')
       .snapshots()
-      .map((s) => s.docs.map((d) => BloodRequest.fromMap(d.id, d.data())).toList());
+      .map((s) => s.docs.map((d) => BloodRequest.fromMap(d.id, d.data())).where((r) => r.isOpen).toList());
 
   @override
   Stream<BloodRequest?> request(String id) =>
@@ -132,7 +207,65 @@ class FirebaseRepository implements RoktoraRepository {
       });
 
   @override
-  Future<void> postRequest(BloodRequest r) => _db.collection('requests').add({...r.toMap(), 'createdBy': uid});
+  Future<void> postRequest(BloodRequest r) => _db.collection('requests').add({...r.toMap(), 'createdBy': uid, 'createdAt': FieldValue.serverTimestamp()});
+
+  @override
+  Stream<List<BloodRequest>> myRequests() => _auth.authStateChanges().asyncExpand((u) {
+        if (u == null) return Stream.value(<BloodRequest>[]);
+        return _db.collection('requests').where('createdBy', isEqualTo: u.uid).snapshots().map((s) {
+          final list = s.docs.map((d) => BloodRequest.fromMap(d.id, d.data())).toList();
+          list.sort((a, b) => b.deadline.compareTo(a.deadline));
+          return list;
+        });
+      });
+
+  @override
+  Future<void> setRequestStatus(String id, String status) => _db.collection('requests').doc(id).update({
+        'status': status,
+        if (status == 'fulfilled') 'fulfilledAt': FieldValue.serverTimestamp(),
+      });
+
+  @override
+  Future<void> reportRequest(String requestId, String reason) => _db.collection('reports').add({
+        'requestId': requestId,
+        'reason': reason,
+        'reportedBy': uid,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+  @override
+  Stream<List<InboxMessage>> inbox() => _auth.authStateChanges().asyncExpand((u) {
+        if (u == null) return Stream.value(<InboxMessage>[]);
+        return _db
+            .collection('users/${u.uid}/inbox')
+            .orderBy('at', descending: true)
+            .limit(50)
+            .snapshots()
+            .map((s) => [for (final d in s.docs) InboxMessage.fromMap(d.id, d.data())]);
+      });
+
+  @override
+  Future<void> markInboxRead(String id) => _me.collection('inbox').doc(id).update({'read': true});
+
+  @override
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    // Deleting the sign-in needs a recent login; check first so we never leave a half-deleted account.
+    final last = user.metadata.lastSignInTime;
+    if (last == null || DateTime.now().difference(last).inMinutes > 5) {
+      throw FirebaseAuthException(code: 'requires-recent-login');
+    }
+    final donations = await _db.collection('users/${user.uid}/donations').get();
+    final batch = _db.batch();
+    for (final d in donations.docs) {
+      batch.delete(d.reference);
+    }
+    batch.delete(_db.collection('donors').doc(user.uid));
+    batch.delete(_db.collection('users').doc(user.uid));
+    await batch.commit();
+    await user.delete();
+  }
 
   @override
   Future<List<NearbyDonor>> nearbyDonors({double? lat, double? lng}) async {
@@ -175,8 +308,8 @@ class FirebaseRepository implements RoktoraRepository {
   Future<void> recordDonation(DonationRecord d) async {
     final batch = _db.batch();
     batch.set(_me.collection('donations').doc(), d.toMap());
-    batch.update(_me, {'donations': FieldValue.increment(1), 'lastDonation': Timestamp.fromDate(d.date), 'eligible': false});
-    batch.set(_db.collection('donors').doc(uid), {'donations': FieldValue.increment(1), 'available': false}, SetOptions(merge: true));
+    batch.update(_me, {'donations': FieldValue.increment(1), 'lastDonation': Timestamp.fromDate(d.date)});
+    batch.set(_db.collection('donors').doc(uid), {'donations': FieldValue.increment(1), 'available': false}, SetOptions(merge: true)); // resting until the cooldown ends
     await batch.commit();
   }
 
@@ -258,6 +391,29 @@ class DemoRepository implements RoktoraRepository {
   }
 
   @override
+  Future<void> signInWithEmail(String email, String password) async {
+    if (password.length < 6) throw FirebaseAuthException(code: 'wrong-password');
+    _uid = _me;
+    _auth.add(_uid);
+  }
+
+  @override
+  Future<void> createAccountWithEmail(String email, String password) async {
+    if (password.length < 6) throw FirebaseAuthException(code: 'weak-password');
+    _uid = _me;
+    _auth.add(_uid);
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {}
+
+  @override
+  Future<void> signInWithGoogle() async {
+    _uid = _me;
+    _auth.add(_uid);
+  }
+
+  @override
   Future<void> signOut() async {
     _uid = null;
     _profile = null;
@@ -285,12 +441,15 @@ class DemoRepository implements RoktoraRepository {
 
   @override
   Stream<List<BloodRequest>> requests() async* {
-    yield List.of(_requests);
-    yield* _req.stream;
+    yield _requests.where((r) => r.isOpen).toList();
+    yield* _req.stream.map((l) => l.where((r) => r.isOpen).toList());
   }
 
   @override
-  Stream<BloodRequest?> request(String id) => requests().map((l) => l.where((r) => r.id == id).firstOrNull);
+  Stream<BloodRequest?> request(String id) async* {
+    yield _requests.where((r) => r.id == id).firstOrNull;
+    yield* _req.stream.map((_) => _requests.where((r) => r.id == id).firstOrNull);
+  }
 
   @override
   Future<void> setCommitment(String requestId, bool committed) async {
@@ -300,7 +459,7 @@ class DemoRepository implements RoktoraRepository {
           BloodRequest(
             id: r.id, bloodGroup: r.bloodGroup, title: r.title, place: r.place, distanceKm: r.distanceKm, bagsNeeded: r.bagsNeeded,
             committed: r.committedUids.where((u) => u != _me).length + (committed ? 1 : 0), urgency: r.urgency, deadline: r.deadline,
-            verified: r.verified, postedBy: r.postedBy, note: r.note, lat: r.lat, lng: r.lng,
+            verified: r.verified, postedBy: r.postedBy, note: r.note, lat: r.lat, lng: r.lng, createdBy: r.createdBy, status: r.status, hospitalId: r.hospitalId, createdAt: r.createdAt, fulfilledAt: r.fulfilledAt,
             committedUids: [...r.committedUids.where((u) => u != _me), if (committed) _me],
           )
         else
@@ -311,9 +470,59 @@ class DemoRepository implements RoktoraRepository {
 
   @override
   Future<void> postRequest(BloodRequest r) async {
-    _requests = [r, ..._requests];
+    _requests = [
+      BloodRequest(
+        id: 'r${DateTime.now().millisecondsSinceEpoch}', bloodGroup: r.bloodGroup, title: r.title, place: r.place, distanceKm: r.distanceKm,
+        bagsNeeded: r.bagsNeeded, committed: 0, urgency: r.urgency, deadline: r.deadline, postedBy: r.postedBy, lat: r.lat, lng: r.lng,
+        createdBy: _me,
+      ),
+      ..._requests,
+    ];
     _emit();
   }
+
+  @override
+  Stream<List<BloodRequest>> myRequests() async* {
+    yield _requests.where((r) => r.isMine(_uid)).toList();
+    yield* _req.stream.map((_) => _requests.where((r) => r.isMine(_uid)).toList());
+  }
+
+  @override
+  Future<void> setRequestStatus(String id, String status) async {
+    _requests = [for (final r in _requests) r.id == id ? r.copyWith(status: status, fulfilledAt: status == 'fulfilled' ? DateTime.now() : null) : r];
+    _emit();
+  }
+
+  @override
+  Future<void> reportRequest(String requestId, String reason) async {}
+
+  final List<InboxMessage> _inbox = [];
+  final _inboxStream = StreamController<void>.broadcast();
+
+  /// Lets the demo hospital dashboard drop a message in the donor's inbox.
+  void deliver(InboxMessage m) {
+    _inbox.insert(0, m);
+    _inboxStream.add(null);
+  }
+
+  @override
+  Stream<List<InboxMessage>> inbox() async* {
+    yield List.of(_inbox);
+    yield* _inboxStream.stream.map((_) => List.of(_inbox));
+  }
+
+  @override
+  Future<void> markInboxRead(String id) async {
+    final i = _inbox.indexWhere((m) => m.id == id);
+    if (i >= 0) {
+      final m = _inbox[i];
+      _inbox[i] = InboxMessage(id: m.id, title: m.title, body: m.body, from: m.from, at: m.at, read: true);
+      _inboxStream.add(null);
+    }
+  }
+
+  @override
+  Future<void> deleteAccount() async => signOut();
 
   @override
   Future<void> saveFcmToken(String token) async {}
@@ -348,7 +557,7 @@ class DemoRepository implements RoktoraRepository {
   @override
   Future<void> recordDonation(DonationRecord d) async {
     _history.insert(0, d);
-    _profile = _profile?.copyWith(donations: (_profile?.donations ?? 0) + 1, lastDonation: d.date, eligible: false);
+    _profile = _profile?.copyWith(donations: (_profile?.donations ?? 0) + 1, lastDonation: d.date);
     _hist.add(null);
     _emit();
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../core/permissions/permissions.dart';
+import '../features/admin/admin_models.dart' show InboxMessage;
 import 'models.dart';
 import 'repository.dart';
 
@@ -15,10 +15,12 @@ final requestProvider =
     StreamProvider.family<BloodRequest?, String>((ref, id) => ref.watch(repositoryProvider).request(id));
 final messagesProvider =
     StreamProvider.family<List<ChatMessage>, String>((ref, id) => ref.watch(repositoryProvider).messages(id));
+final myRequestsProvider = StreamProvider<List<BloodRequest>>((ref) => ref.watch(repositoryProvider).myRequests());
+final inboxProvider = StreamProvider<List<InboxMessage>>((ref) => ref.watch(repositoryProvider).inbox());
 final donationsProvider = StreamProvider<List<DonationRecord>>((ref) => ref.watch(repositoryProvider).donations());
-final nearbyDonorsProvider = FutureProvider<List<NearbyDonor>>((ref) async {
-  final pos = ref.watch(userLocationProvider).value;
-  return ref.watch(repositoryProvider).nearbyDonors(lat: pos?.lat, lng: pos?.lng);
+/// Donors ranked by distance from a map centre (rounded so tiny pans don't refetch).
+final nearbyDonorsProvider = FutureProvider.family<List<NearbyDonor>, (double, double)?>((ref, centre) {
+  return ref.watch(repositoryProvider).nearbyDonors(lat: centre?.$1, lng: centre?.$2);
 });
 
 /// Persists light/dark/system choice.

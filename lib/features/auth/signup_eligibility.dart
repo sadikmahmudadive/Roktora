@@ -8,8 +8,7 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/models.dart';
 import '../../data/providers.dart';
-
-const _areas = ['Dhanmondi, Dhaka', 'Mirpur, Dhaka', 'Uttara, Dhaka', 'Agrabad, Chattogram'];
+import '../location/location_picker.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -19,19 +18,25 @@ class SignUpScreen extends ConsumerStatefulWidget {
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _name = TextEditingController();
-  String _area = _areas.first;
+  PickedLocation? _loc;
   String? _group;
   bool _available = true;
   bool _busy = false;
 
-  bool get _valid => _name.text.trim().length >= 2;
+  bool get _valid => _name.text.trim().length >= 2 && _loc != null;
+
+  Future<void> _pickLocation() async {
+    final r = await pickLocation(context, title: 'Where are you based?', initial: _loc?.latLng);
+    if (r != null && mounted) setState(() => _loc = r);
+  }
 
   Future<void> _create() async {
     final repo = ref.read(repositoryProvider);
     setState(() => _busy = true);
     try {
       await repo.saveProfile(DonorProfile(
-        uid: repo.uid!, name: _name.text.trim(), area: _area, bloodGroup: _group, available: _available,
+        uid: repo.uid!, name: _name.text.trim(), area: _loc!.label, bloodGroup: _group, available: _available,
+        lat: _loc!.lat, lng: _loc!.lng,
       ));
       if (mounted) context.go('/eligibility');
     } catch (_) {
@@ -76,20 +81,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               Text(_name.text.trim().length > 1 ? 'Requesters only see "${DonorProfile(uid: '', name: _name.text, area: '').publicName}"' : 'Requesters only see your first name and last initial',
                   style: TextStyle(fontSize: 12, color: c.textMuted)),
               const SizedBox(height: 22),
-              const Text('Your area', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              const Text('Your location', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                initialValue: _area,
-                icon: Icon(TablerIcons.chevron_down, size: 18, color: c.textMuted),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: c.textPrimary),
-                dropdownColor: c.surface1,
-                decoration: InputDecoration(
-                  filled: true, fillColor: c.surface1, prefixIcon: Icon(TablerIcons.map_pin, color: c.textMuted),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18), enabledBorder: border(c.borderStrong), focusedBorder: border(c.fillBrand, 1.5),
-                ),
-                items: [for (final a in _areas) DropdownMenuItem(value: a, child: Text(a))],
-                onChanged: (v) => setState(() => _area = v ?? _area),
-              ),
+              LocationField(label: _loc?.label, placeholder: 'Set your location on the map', onTap: _pickLocation),
+              const SizedBox(height: 6),
+              Text('Used to find requests near you. Others only see an approximate area.', style: TextStyle(fontSize: 12, color: c.textMuted)),
               const SizedBox(height: 22),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 const Text('Blood group', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),

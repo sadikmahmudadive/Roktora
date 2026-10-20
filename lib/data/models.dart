@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Areas offered at sign-up and in the profile editor.
+const donorAreas = ['Dhanmondi, Dhaka', 'Mirpur, Dhaka', 'Uttara, Dhaka', 'Agrabad, Chattogram'];
+
 const bloodGroups = ['A+', 'A−', 'B+', 'B−', 'O+', 'O−', 'AB+', 'AB−'];
 
 enum Urgency { critical, urgent, routine }
@@ -14,13 +17,34 @@ class DonorProfile {
     this.donations = 0,
     this.lastDonation,
     this.eligible = true,
+    this.lat,
+    this.lng,
   });
 
   final String uid, name, area;
+
+  /// Where the donor set their location on the map (null for profiles made before maps).
+  final double? lat, lng;
+  bool get hasLocation => lat != null && lng != null;
   final String? bloodGroup;
   final bool available, eligible;
   final int donations;
   final DateTime? lastDonation;
+
+  /// Whole-blood donors rest this long between donations.
+  static const cooldownDays = 120;
+
+  DateTime? get nextEligibleDate => lastDonation?.add(const Duration(days: cooldownDays));
+
+  /// Days left before the next donation is allowed; 0 once the cooldown is over.
+  int get daysUntilEligible {
+    final next = nextEligibleDate;
+    if (next == null || !next.isAfter(DateTime.now())) return 0;
+    return (next.difference(DateTime.now()).inHours / 24).ceil();
+  }
+
+  /// Screening passed AND the cooldown since the last donation has finished.
+  bool get isEligibleNow => eligible && daysUntilEligible == 0;
 
   String get initials {
     final p = name.trim().split(RegExp(r'\s+'));
@@ -33,16 +57,19 @@ class DonorProfile {
     return p.length == 1 ? p.first : '${p.first} ${p.last[0]}.';
   }
 
-  DonorProfile copyWith({String? name, String? area, String? bloodGroup, bool? available, bool? eligible, int? donations, DateTime? lastDonation}) =>
+  DonorProfile copyWith({String? name, String? area, String? bloodGroup, bool? available, bool? eligible, int? donations, DateTime? lastDonation, double? lat, double? lng}) =>
       DonorProfile(
         uid: uid, name: name ?? this.name, area: area ?? this.area, bloodGroup: bloodGroup ?? this.bloodGroup,
         available: available ?? this.available, eligible: eligible ?? this.eligible,
         donations: donations ?? this.donations, lastDonation: lastDonation ?? this.lastDonation,
+        lat: lat ?? this.lat, lng: lng ?? this.lng,
       );
 
   Map<String, dynamic> toMap() => {
         'name': name, 'area': area, 'bloodGroup': bloodGroup, 'available': available, 'eligible': eligible,
         'donations': donations, 'lastDonation': lastDonation == null ? null : Timestamp.fromDate(lastDonation!),
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
       };
 
   factory DonorProfile.fromMap(String uid, Map<String, dynamic> m) => DonorProfile(
@@ -54,6 +81,8 @@ class DonorProfile {
         eligible: (m['eligible'] ?? true) as bool,
         donations: (m['donations'] ?? 0) as int,
         lastDonation: (m['lastDonation'] as Timestamp?)?.toDate(),
+        lat: (m['lat'] as num?)?.toDouble(),
+        lng: (m['lng'] as num?)?.toDouble(),
       );
 }
 
@@ -74,9 +103,35 @@ class BloodRequest {
     this.committedUids = const [],
     this.lat,
     this.lng,
+    this.createdBy = '',
+    this.status = 'open',
+    this.hospitalId = '',
+    this.createdAt,
+    this.fulfilledAt,
   });
 
   final String id, bloodGroup, title, place, postedBy, note;
+
+  /// Set for requests posted from a hospital dashboard (empty for individual requests).
+  final String hospitalId;
+
+  /// When the request was posted / marked fulfilled. Used for time-to-fill reporting.
+  final DateTime? createdAt, fulfilledAt;
+
+  /// Uid of the poster (empty for hospital-posted or older requests).
+  final String createdBy;
+
+  /// open | fulfilled | closed
+  final String status;
+  bool get isOpen => status == 'open';
+  bool isMine(String? uid) => uid != null && createdBy == uid;
+
+  BloodRequest copyWith({String? status, DateTime? fulfilledAt}) => BloodRequest(
+        id: id, bloodGroup: bloodGroup, title: title, place: place, distanceKm: distanceKm, bagsNeeded: bagsNeeded,
+        committed: committed, urgency: urgency, deadline: deadline, verified: verified, postedBy: postedBy, note: note,
+        committedUids: committedUids, lat: lat, lng: lng, createdBy: createdBy, status: status ?? this.status,
+        hospitalId: hospitalId, createdAt: createdAt, fulfilledAt: fulfilledAt ?? this.fulfilledAt,
+      );
 
   /// Where blood is needed (hospital or ward). Null for older requests, which then don't appear on the map.
   final double? lat, lng;
@@ -94,6 +149,9 @@ class BloodRequest {
         'bloodGroup': bloodGroup, 'title': title, 'place': place, 'distanceKm': distanceKm,
         'bagsNeeded': bagsNeeded, 'urgency': urgency.name, 'deadline': Timestamp.fromDate(deadline),
         'verified': verified, 'postedBy': postedBy, 'note': note, 'committedUids': committedUids,
+        'status': status,
+        if (hospitalId.isNotEmpty) 'hospitalId': hospitalId,
+        if (fulfilledAt != null) 'fulfilledAt': Timestamp.fromDate(fulfilledAt!),
         if (lat != null) 'lat': lat,
         if (lng != null) 'lng': lng,
       };
@@ -116,6 +174,11 @@ class BloodRequest {
       committedUids: uids,
       lat: (m['lat'] as num?)?.toDouble(),
       lng: (m['lng'] as num?)?.toDouble(),
+      createdBy: (m['createdBy'] ?? '') as String,
+      status: (m['status'] ?? 'open') as String,
+      hospitalId: (m['hospitalId'] ?? '') as String,
+      createdAt: (m['createdAt'] as Timestamp?)?.toDate(),
+      fulfilledAt: (m['fulfilledAt'] as Timestamp?)?.toDate(),
     );
   }
 }

@@ -222,7 +222,11 @@ class HomeScreen extends ConsumerWidget {
                   Text('${_greeting()}${profile == null ? '' : ', ${profile.name.split(' ').first}'}', style: AppTheme.display(context, size: 26)),
                 ]),
               ),
-              CircleIconButton(icon: TablerIcons.bell, label: 'Notifications', onPressed: () {}),
+              Stack(clipBehavior: Clip.none, children: [
+                CircleIconButton(icon: TablerIcons.bell, label: 'Messages', onPressed: () => context.push('/inbox')),
+                if ((ref.watch(inboxProvider).value ?? const []).any((m) => !m.read))
+                  Positioned(right: 2, top: 2, child: Container(width: 12, height: 12, decoration: BoxDecoration(color: c.fillBrand, shape: BoxShape.circle, border: Border.all(color: c.surface0, width: 2)))),
+              ]),
             ]),
           ),
           const SizedBox(height: 16),
@@ -282,6 +286,27 @@ class HomeScreen extends ConsumerWidget {
 class _DonorTile extends ConsumerWidget {
   const _DonorTile(this.p);
   final DonorProfile p;
+  Widget _eligibilityChip(BuildContext context, RColors c) {
+    Widget chip(Color bg, Color fg, IconData icon, String text, {VoidCallback? onTap}) => InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(99),
+          child: Container(
+            height: 22, padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(99)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, size: 13, color: fg), const SizedBox(width: 4),
+              Text(text, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg)),
+            ]),
+          ),
+        );
+    if (!p.eligible) {
+      return chip(c.bgWarning, c.textWarning, TablerIcons.clock_pause, 'Retake check', onTap: () => context.push('/eligibility'));
+    }
+    final days = p.daysUntilEligible;
+    if (days > 0) return chip(c.bgWarning, c.textWarning, TablerIcons.clock, 'Eligible in $days day${days == 1 ? '' : 's'}');
+    return chip(c.bgSuccess, c.textSuccess, TablerIcons.circle_check, 'Eligible now');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.rc;
@@ -295,20 +320,7 @@ class _DonorTile extends ConsumerWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 if (p.bloodGroup != null) ...[BloodPill(p.bloodGroup!, role: roleForGroup(p.bloodGroup!), height: 22, size: 12), const SizedBox(width: 8)],
-                p.eligible
-                    ? Container(
-                        height: 22, padding: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(color: c.bgSuccess, borderRadius: BorderRadius.circular(99)),
-                        child: Row(children: [Icon(TablerIcons.circle_check, size: 13, color: c.textSuccess), const SizedBox(width: 4), Text('Eligible now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: c.textSuccess))]),
-                      )
-                    : InkWell(
-                        onTap: () => context.push('/eligibility'),
-                        child: Container(
-                          height: 22, padding: const EdgeInsets.symmetric(horizontal: 8), alignment: Alignment.center,
-                          decoration: BoxDecoration(color: c.bgWarning, borderRadius: BorderRadius.circular(99)),
-                          child: Text('Retake check', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: c.textWarning)),
-                        ),
-                      ),
+                _eligibilityChip(context, c),
               ]),
               const SizedBox(height: 4),
               Text('${p.donations} donation${p.donations == 1 ? '' : 's'}${last == null ? '' : ' · last on ${DateFormat('d MMM').format(last)}'}', style: TextStyle(fontSize: 13, color: c.textSecondary)),

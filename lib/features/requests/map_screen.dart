@@ -13,6 +13,7 @@ import '../../data/models.dart';
 import '../../data/providers.dart';
 import '../home/shell_home.dart' show urgencyColor, urgencyLabel, urgencyText;
 import '../permissions/permissions_screen.dart';
+import '../location/location_picker.dart';
 import 'donor_map.dart';
 
 /// Nearby donors and open requests on a Google Map. Donor pins show an approximate block,
@@ -32,14 +33,39 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   String? _selected;
   LatLng? _focus;
   int _focusTick = 0;
+  PickedLocation? _viewing; // a place the user chose to look at instead of their own position
   final _sheet = DraggableScrollableController();
 
   bool get _located => ref.read(userLocationProvider).value != null;
 
-  /// The user's real position when allowed, else the area they chose at sign-up.
+  /// Where the map is centred: a place picked on the map, else the live position, else the location
+  /// saved in the profile, else the sign-up area.
   LatLng _center() {
+    if (_viewing != null) return _viewing!.latLng;
     final loc = ref.watch(userLocationProvider).value;
-    return loc != null ? LatLng(loc.lat, loc.lng) : centerForArea(ref.watch(profileProvider).value?.area);
+    if (loc != null) return LatLng(loc.lat, loc.lng);
+    final p = ref.watch(profileProvider).value;
+    if (p != null && p.hasLocation) return LatLng(p.lat!, p.lng!);
+    return centerForArea(p?.area);
+  }
+
+  String _centerLabel() => _viewing?.label ?? ref.watch(profileProvider).value?.area ?? 'Your area';
+
+  Future<void> _changeViewLocation() async {
+    final r = await pickLocation(
+      context,
+      title: 'Look somewhere else',
+      confirmLabel: 'Show this area',
+      initial: _center(),
+      hint: 'See donors and requests around any place. This only changes the map, not your profile location.',
+    );
+    if (r != null && mounted) {
+      setState(() {
+        _viewing = r;
+        _selected = null;
+        _recenter++;
+      });
+    }
   }
 
   @override
@@ -52,7 +78,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final snap = ref.read(permissionsProvider).value ?? const PermSnapshot();
     if (permissionOk(AppPermission.location, snap)) {
       ref.invalidate(userLocationProvider);
-      setState(() => _recenter++);
+      setState(() {
+        _viewing = null;
+        _recenter++;
+      });
     } else {
       await actOnPermission(ref, AppPermission.location, snap);
       ref.invalidate(userLocationProvider);
@@ -85,7 +114,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final c = context.rc;
     final center = _center();
 
-    final donors = (ref.watch(nearbyDonorsProvider).value ?? const <NearbyDonor>[])
+    double r3(double v) => (v * 1000).round() / 1000;
+    final donors = (ref.watch(nearbyDonorsProvider((r3(center.latitude), r3(center.longitude)))).value ?? const <NearbyDonor>[])
         .where((d) => (_group == 'All' || d.bloodGroup == _group) && d.distanceKm <= _radius)
         .toList()
       ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
@@ -303,10 +333,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(children: [
                     Expanded(
-                      child: Container(
-                        height: 44, padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(color: c.surface1, borderRadius: BorderRadius.circular(RRadius.base), border: Border.all(color: c.borderStrong)),
-                        child: Row(children: [Icon(TablerIcons.search, size: 18, color: c.textMuted), const SizedBox(width: 8), Expanded(child: Text(ref.watch(profileProvider).value?.area ?? 'Your area', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.textMuted)))]),
+                      child: Semantics(
+                        button: true,
+                        label: 'Change map location. Showing ${_centerLabel()}',
+                        child: InkWell(
+                          onTap: _changeViewLocation,
+                          borderRadius: BorderRadius.circular(RRadius.base),
+                          child: Container(
+                            height: 44, padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(color: c.surface1, borderRadius: BorderRadius.circular(RRadius.base), border: Border.all(color: _viewing != null ? c.fillBrand : c.borderStrong)),
+                            child: Row(children: [
+                              Icon(TablerIcons.search, size: 18, color: c.textMuted),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(_centerLabel(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: _viewing != null ? c.textPrimary : c.textMuted, fontWeight: _viewing != null ? FontWeight.w600 : FontWeight.w400))),
+                              if (_viewing != null)
+                                GestureDetector(
+                                  onTap: () => setState(() {
+                                    _viewing = null;
+                                    _recenter++;
+                                  }),
+                                  child: Icon(TablerIcons.x, size: 16, color: c.textMuted),
+                                ),
+                            ]),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),

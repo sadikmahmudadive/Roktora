@@ -180,6 +180,52 @@ class PassportScreen extends ConsumerStatefulWidget {
 class _PassportScreenState extends ConsumerState<PassportScreen> {
   int _tab = 0;
 
+  Widget _myRequests(RColors c, List<BloodRequest> list) {
+    if (list.isEmpty) {
+      return const SurfaceCard(child: EmptyState(icon: TablerIcons.file_text, title: 'No requests yet', message: 'Requests you post for someone will be listed here.'));
+    }
+    final repo = ref.read(repositoryProvider);
+    return SurfaceCard(
+      padding: EdgeInsets.zero,
+      child: Column(children: [
+        for (final (i, r) in list.indexed)
+          InkWell(
+            onTap: () => context.push('/request/${r.id}'),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 12, 4, 12),
+              decoration: BoxDecoration(border: i == 0 ? null : Border(top: BorderSide(color: c.border))),
+              child: Row(children: [
+                BloodPill(r.bloodGroup, role: roleForGroup(r.bloodGroup), height: 24, size: 12),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(r.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text('${r.place} · ${r.committed} of ${r.bagsNeeded} committed', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: c.textSecondary)),
+                  ]),
+                ),
+                const SizedBox(width: 8),
+                BloodPill(
+                  switch (r.status) { 'fulfilled' => 'Fulfilled', 'closed' => 'Closed', _ => 'Open' },
+                  role: switch (r.status) { 'fulfilled' => PillRole.success, 'closed' => PillRole.neutral, _ => PillRole.warning },
+                  height: 24, size: 12,
+                ),
+                PopupMenuButton<String>(
+                  tooltip: 'Manage request',
+                  icon: Icon(TablerIcons.dots_vertical, size: 20, color: c.textMuted),
+                  onSelected: (v) => repo.setRequestStatus(r.id, v),
+                  itemBuilder: (_) => [
+                    if (r.isOpen) const PopupMenuItem(value: 'fulfilled', child: Text('Mark fulfilled')),
+                    if (r.isOpen) const PopupMenuItem(value: 'closed', child: Text('Close request')),
+                    if (!r.isOpen) const PopupMenuItem(value: 'open', child: Text('Reopen')),
+                  ],
+                ),
+              ]),
+            ),
+          ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.rc;
@@ -252,7 +298,7 @@ class _PassportScreenState extends ConsumerState<PassportScreen> {
         ),
         const SizedBox(height: 12),
         if (_tab == 1)
-          const SurfaceCard(child: EmptyState(icon: TablerIcons.file_text, title: 'No requests yet', message: 'Requests you post for someone will be listed here.'))
+          _myRequests(c, ref.watch(myRequestsProvider).value ?? const <BloodRequest>[])
         else if (history.isEmpty)
           const SurfaceCard(child: EmptyState(icon: TablerIcons.droplet, title: 'No donations yet', message: 'Your first donation will appear here, with your recovery timeline.'))
         else

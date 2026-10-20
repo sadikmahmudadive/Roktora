@@ -38,7 +38,7 @@ String requestKey(String id) => 'r:$id';
 
 double _zoomForRadius(int km) => switch (km) { 1 => 14.6, 3 => 13.4, _ => 12.6 };
 
-const _darkStyle = '''[
+const mapDarkStyle = '''[
 {"elementType":"geometry","stylers":[{"color":"#282724"}]},
 {"elementType":"labels.text.fill","stylers":[{"color":"#9a978f"}]},
 {"elementType":"labels.text.stroke","stylers":[{"color":"#1d1c1b"}]},
@@ -47,7 +47,7 @@ const _darkStyle = '''[
 {"featureType":"poi","stylers":[{"visibility":"off"}]}
 ]''';
 
-const _lightStyle = '''[
+const mapLightStyle = '''[
 {"featureType":"poi","stylers":[{"visibility":"off"}]},
 {"featureType":"transit","stylers":[{"visibility":"off"}]}
 ]''';
@@ -183,7 +183,7 @@ class _DonorMapState extends State<DonorMap> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return GoogleMap(
       initialCameraPosition: CameraPosition(target: widget.center, zoom: _zoomForRadius(widget.radiusKm)),
-      style: dark ? _darkStyle : _lightStyle,
+      style: dark ? mapDarkStyle : mapLightStyle,
       markers: _markers,
       circles: {
         Circle(

@@ -6,15 +6,66 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
 
-    // Private profile: only the owner. Contains full name and exact dates.
-    match /users/{uid} {
-      allow read, create, update: if isOwner(uid);
-      allow delete: if false;
+    // Every signed-in user gets an /accounts/{uid} record automatically. Hospital staff are the accounts whose
+    // `role` is 'admin' or 'staff' AND that have a `hospitalId`. Those two fields can only be set in the Firebase
+    // console (or with the Admin SDK): the rules below never let a user write them.
+    function account() { return get(/databases/$(database)/documents/accounts/$(request.auth.uid)).data; }
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/accounts/$(request.auth.uid))
+        && account().get('role', 'user') in ['admin', 'staff']
+        && account().get('hospitalId', '') != '';
+    }
+    // Platform team: accounts whose role is 'superadmin' (set only in the console). They manage who is
+    // hospital staff and which hospitals exist/are verified; they get no donor data from this role alone.
+    function isSuper() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/accounts/$(request.auth.uid))
+        && account().get('role', 'user') == 'superadmin';
+    }
+    function adminHospital() { return account().hospitalId; }
+    function isStaffOf(hid) { return isAdmin() && adminHospital() == hid; }
 
-      // Donation history is private to the donor.
+    match /accounts/{uid} {
+      allow read: if isOwner(uid) || isSuper();
+      // Superadmins assign roles and hospitals to others (never to/for another superadmin, never superadmin itself).
+      allow update: if isSuper()
+        && resource.data.get('role', 'user') != 'superadmin'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'hospitalId'])
+        && request.resource.data.get('role', 'user') in ['user', 'staff', 'admin'];
+      // A new account is always a plain user with no hospital.
+      allow create: if isOwner(uid)
+        && request.resource.data.get('role', 'user') == 'user'
+        && !('hospitalId' in request.resource.data);
+      // Users may refresh their own sign-in details, never their role or hospital.
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['email', 'phone', 'displayName', 'photoURL', 'providers', 'lastLoginAt']);
+      allow delete: if isOwner(uid); // account deletion
+    }
+
+    // Private profile: the owner, plus hospital staff (who see donors in the directory).
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid)
+        // Staff may only record a completed donation.
+        || (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['donations', 'lastDonation']));
+      allow delete: if isOwner(uid); // account deletion
+
+      // Donation history is private to the donor; staff can log a new donation.
       match /donations/{id} {
-        allow read, create: if isOwner(uid);
-        allow update, delete: if false;
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) || isAdmin();
+        allow update: if false;
+        allow delete: if isOwner(uid);
+      }
+
+      // Messages hospitals send to a donor.
+      match /inbox/{id} {
+        allow read: if isOwner(uid);
+        allow create: if isAdmin();
+        allow update: if isOwner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        allow delete: if isOwner(uid);
       }
     }
 
@@ -23,7 +74,31 @@ service cloud.firestore {
       allow read: if signedIn();
       allow create, update: if isOwner(uid)
         && request.resource.data.keys().hasOnly(['publicName', 'bloodGroup', 'area', 'available', 'donations', 'approxLat', 'approxLng']);
-      allow delete: if false;
+      // Staff can rest a donor after a donation.
+      allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['donations', 'available']);
+      allow delete: if isOwner(uid);
+    }
+
+    // Hospital data: readable by signed-in users (public profile), writable by that hospital's staff.
+    match /hospitals/{hid} {
+      allow read: if signedIn();
+      // Superadmins create, verify and remove hospitals.
+      allow delete: if isSuper();
+      // A hospital's admin can create its (unverified) profile the first time; superadmins can create any.
+      allow create: if isSuper()
+        || (isStaffOf(hid)
+          && account().get('role', 'user') == 'admin'
+          && request.resource.data.keys().hasOnly(['name', 'address', 'phone', 'about', 'lat', 'lng']));
+      allow update: if isSuper()
+        // The hospital's admins (not ordinary staff) edit the public details, but never `verified` or the steps.
+        || (isStaffOf(hid)
+          && account().get('role', 'user') == 'admin'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'address', 'phone', 'about', 'lat', 'lng']));
+
+      // inventory, batches, checkins
+      match /{collection}/{doc} {
+        allow read, write: if isStaffOf(hid);
+      }
     }
 
     match /requests/{requestId} {
@@ -34,14 +109,22 @@ service cloud.firestore {
 
       allow read: if signedIn();
 
-      // Individuals can post, but never as verified and never pre-committed.
-      // Verified hospital requests are written with the Admin SDK / console only.
+      // Individuals can post, but never as verified, never pre-committed, and never as a hospital.
       allow create: if signedIn()
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.verified == false
+        && !('hospitalId' in request.resource.data)
         && request.resource.data.committedUids.size() == 0
         && request.resource.data.bagsNeeded is int
         && request.resource.data.bagsNeeded >= 1 && request.resource.data.bagsNeeded <= 10
+        && request.resource.data.title is string && request.resource.data.title.size() <= 120;
+
+      // A hospital's staff post verified requests for their own hospital.
+      allow create: if isStaffOf(request.resource.data.get('hospitalId', ''))
+        && request.resource.data.verified == true
+        && request.resource.data.committedUids.size() == 0
+        && request.resource.data.bagsNeeded is int
+        && request.resource.data.bagsNeeded >= 1 && request.resource.data.bagsNeeded <= 50
         && request.resource.data.title is string && request.resource.data.title.size() <= 120;
 
       // Donors may only add or remove their own uid from committedUids.
@@ -51,6 +134,12 @@ service cloud.firestore {
           request.resource.data.committedUids.toSet().difference(resource.data.committedUids.toSet()).hasOnly([request.auth.uid])
           && resource.data.committedUids.toSet().difference(request.resource.data.committedUids.toSet()).hasOnly([request.auth.uid])
         );
+
+      // The poster, or the hospital's staff, can mark it fulfilled / closed (and nothing else).
+      allow update: if signedIn()
+        && (resource.data.get('createdBy', '') == request.auth.uid || isStaffOf(resource.data.get('hospitalId', '')))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'fulfilledAt'])
+        && request.resource.data.status in ['open', 'fulfilled', 'closed'];
 
       allow delete: if signedIn() && resource.data.get('createdBy', '') == request.auth.uid;
 
@@ -63,6 +152,15 @@ service cloud.firestore {
           && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
         allow update, delete: if false;
       }
+    }
+
+    // Reports are write-only for users; moderators read them in the console.
+    match /reports/{reportId} {
+      allow create: if signedIn()
+        && request.resource.data.reportedBy == request.auth.uid
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() <= 200;
+      allow read, update, delete: if false;
     }
   }
 }

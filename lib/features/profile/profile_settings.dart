@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -9,6 +10,7 @@ import '../permissions/permissions_screen.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/providers.dart';
+import '../admin/admin_providers.dart';
 import '../home/shell_home.dart' show kNavClearance;
 
 /// Device-local preference toggles (privacy, notifications), persisted with shared_preferences.
@@ -69,14 +71,83 @@ class ProfileScreen extends ConsumerWidget {
         SurfaceCard(
           padding: EdgeInsets.zero,
           child: Column(children: [
-            _MenuRow(TablerIcons.heartbeat, 'Eligibility check', onTap: () => context.push('/eligibility')),
+            _MenuRow(TablerIcons.user_edit, 'Edit profile', onTap: () => context.push('/profile/edit')),
+            _MenuRow(TablerIcons.heartbeat, 'Eligibility check', divider: true, onTap: () => context.push('/eligibility')),
+            if (ref.watch(adminAccessProvider).value != null)
+              _MenuRow(TablerIcons.layout_dashboard, 'Hospital dashboard', divider: true, onTap: () => context.go('/admin')),
             _MenuRow(TablerIcons.settings, 'Settings', divider: true, onTap: () => context.push('/settings')),
           ]),
         ),
         const SizedBox(height: 16),
-        PillButton('Sign out', outlined: true, height: 52, onPressed: () => ref.read(repositoryProvider).signOut()),
+        PillButton('Sign out', outlined: true, height: 52, onPressed: () => _confirmSignOut(context, ref)),
       ]),
     );
+  }
+}
+
+Future<void> _confirmSignOut(BuildContext context, WidgetRef ref) async {
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Sign out?'),
+      content: const Text("You'll stop getting alerts on this phone until you sign in again."),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Stay signed in')),
+        TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sign out')),
+      ],
+    ),
+  );
+  if (ok == true) await ref.read(repositoryProvider).signOut();
+}
+
+Future<void> _deleteAccount(BuildContext context, WidgetRef ref) async {
+  final repo = ref.read(repositoryProvider);
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Delete your account?'),
+      content: const Text(
+        'This permanently removes your profile, donation history and sign-in. '
+        'Requests you posted stay visible until they expire or you close them first.',
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Keep my account')),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          style: TextButton.styleFrom(foregroundColor: ctx.rc.textDanger),
+          child: const Text('Delete forever'),
+        ),
+      ],
+    ),
+  );
+  if (ok != true) return;
+  try {
+    await repo.deleteAccount(); // the auth stream then sends the router back to login
+  } on FirebaseAuthException catch (e) {
+    if (!context.mounted) return;
+    if (e.code == 'requires-recent-login') {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Sign in again first'),
+          content: const Text('For your security, deleting an account needs a recent sign-in. Sign out, sign back in, then try again.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                repo.signOut();
+              },
+              child: const Text('Sign out'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Couldn't delete the account. Try again.")));
+    }
+  } catch (_) {
+    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Couldn't delete the account. Check your connection and try again.")));
   }
 }
 
@@ -151,6 +222,24 @@ class SettingsScreen extends ConsumerWidget {
                   child: Row(children: [Expanded(child: Text(m.$2, style: const TextStyle(fontWeight: FontWeight.w500))), if (mode == m.$1) Icon(TablerIcons.check, color: c.textBrand)]),
                 ),
               ),
+          ]),
+          section('Account', [
+            InkWell(
+              onTap: () => _deleteAccount(context, ref),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(children: [
+                  Icon(TablerIcons.trash, size: 20, color: c.textDanger),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('Delete account', style: TextStyle(fontWeight: FontWeight.w500, color: c.textDanger)),
+                      Text('Removes your profile and history', style: TextStyle(fontSize: 12, color: c.textSecondary)),
+                    ]),
+                  ),
+                ]),
+              ),
+            ),
           ]),
         ]),
       ),

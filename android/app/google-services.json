@@ -12,7 +12,20 @@
           "package_name": "com.vertexhand.roktora"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "171688562337-spgks2m9lpiq4ujhdvgrnj8g6dhe7s9r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertexhand.roktora",
+            "certificate_hash": "6023237f0e0c8fbc8ba551f3b13f8a7efbfa37fc"
+          }
+        },
+        {
+          "client_id": "171688562337-1373vhf48i9rdg66qg1it5s998i14fm6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDIa2bWNz8SSoKNKfyAm2UljZ_cvNOFDhI"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "171688562337-1373vhf48i9rdg66qg1it5s998i14fm6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "171688562337-jpqnj1e8qt399an3dv0lq852dkrrdmol.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vertexhand.roktora"
+              }
+            }
+          ]
         }
       }
     }
