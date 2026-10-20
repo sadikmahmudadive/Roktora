@@ -13,6 +13,7 @@ interface GMaps {
   Map: new (el: HTMLElement, o: object) => GMap;
   Marker: new (o: object) => GMarker;
   Geocoder: new () => GGeocoder;
+  importLibrary(name: "maps" | "geocoding"): Promise<unknown>;
 }
 declare global {
   interface Window { google?: { maps: GMaps }; __roktoraMapsReady?: () => void }
@@ -24,11 +25,15 @@ const DHAKA: LatLng = { lat: 23.8103, lng: 90.4125 };
 let loader: Promise<GMaps> | null = null;
 function loadMaps(): Promise<GMaps> {
   if (typeof window === "undefined") return Promise.reject(new Error("no window"));
-  if (window.google?.maps) return Promise.resolve(window.google.maps);
+  if (window.google?.maps?.Map) return Promise.resolve(window.google.maps);
   loader ??= new Promise<GMaps>((resolve, reject) => {
-    window.__roktoraMapsReady = () => resolve(window.google!.maps);
+    // With loading=async the bootstrap calls back first; the classes are then imported on demand.
+    window.__roktoraMapsReady = () => {
+      const maps = window.google!.maps;
+      Promise.all([maps.importLibrary("maps"), maps.importLibrary("geocoding")]).then(() => resolve(maps), reject);
+    };
     const s = document.createElement("script");
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(KEY ?? "")}&callback=__roktoraMapsReady&v=weekly`;
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(KEY ?? "")}&loading=async&callback=__roktoraMapsReady&v=weekly`;
     s.async = true;
     s.onerror = () => {
       loader = null;

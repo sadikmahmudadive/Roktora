@@ -10,7 +10,7 @@ import { useStaff } from "@/components/shell";
 import { Avatar, Banner, Button, Dialog, Empty, IconButton, Page, Panel, Pill, Progress, Segmented, Spinner, cn } from "@/components/ui";
 import { useMedia } from "@/lib/use-media";
 import { donorLookup, setRequestStatus, useCheckins, useHospitalRequests } from "@/lib/store";
-import { BLOOD_GROUPS, type BloodRequest, type CheckIn, type DonorEntry, type Urgency } from "@/lib/types";
+import { type BloodRequest, type CheckIn, type DonorEntry, type Urgency } from "@/lib/types";
 
 export default function RequestsPage() {
   // useSearchParams needs a Suspense boundary under Cache Components.
