@@ -20,6 +20,7 @@ import 'features/permissions/permissions_screen.dart';
 import 'features/profile/edit_profile.dart';
 import 'features/profile/post_donation.dart';
 import 'features/profile/profile_settings.dart';
+import 'features/requests/chat_screens.dart';
 import 'features/requests/map_screen.dart';
 import 'features/requests/request_screens.dart';
 

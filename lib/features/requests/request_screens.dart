@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
-import '../../core/widgets/motion.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/models.dart';
 import '../../data/providers.dart';
@@ -134,7 +133,14 @@ class RequestDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             decoration: BoxDecoration(border: Border(top: BorderSide(color: c.border)), color: c.surface0),
             child: Row(children: [
-              CircleIconButton(icon: TablerIcons.message_circle, size: 52, label: owner ? 'Chat with donors' : 'Message requester', filled: false, onPressed: () => context.push('/chat/${r.id}')),
+              CircleIconButton(icon: TablerIcons.message_circle, size: 52, label: owner ? 'Chat with donors' : 'Message requester', filled: false, onPressed: () {
+                // Chats are open to the requester and donors who committed (the rules enforce it).
+                if (owner || mine) {
+                  context.push('/chat/${r.id}');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Commit to this request to chat with the requester.')));
+                }
+              }),
               const SizedBox(width: 8),
               Expanded(
                 child: owner
@@ -251,181 +257,6 @@ class _InfoRow extends StatelessWidget {
           ]),
         ),
       ]),
-    );
-  }
-}
-
-class ChatScreen extends ConsumerStatefulWidget {
-  const ChatScreen({super.key, required this.requestId});
-  final String requestId;
-  @override
-  ConsumerState<ChatScreen> createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends ConsumerState<ChatScreen> {
-  final _ctrl = TextEditingController();
-  final _scroll = ScrollController();
-
-  void _send(String t) {
-    if (t.trim().isEmpty) return;
-    ref.read(repositoryProvider).sendMessage(widget.requestId, t.trim());
-    _ctrl.clear();
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent + 80, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
-    });
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    _scroll.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.rc;
-    final me = ref.read(repositoryProvider).uid;
-    final req = ref.watch(requestProvider(widget.requestId)).value;
-    final msgs = ref.watch(messagesProvider(widget.requestId)).value ?? const <ChatMessage>[];
-    return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          Container(
-            height: 60, padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.border))),
-            child: Row(children: [
-              CircleIconButton(icon: TablerIcons.arrow_left, label: 'Back', onPressed: () => context.pop()),
-              const SizedBox(width: 8),
-              DonorAvatar((req?.postedBy.isNotEmpty ?? false) ? req!.postedBy.substring(0, 1) : 'R', size: 36),
-              const SizedBox(width: 8),
-              Expanded(child: Text(req?.postedBy.isNotEmpty == true ? req!.postedBy : (req?.place ?? 'Requester'), style: const TextStyle(fontWeight: FontWeight.w600))),
-            ]),
-          ),
-          if (req != null)
-            InkWell(
-              onTap: () => context.push('/request/${req.id}'),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(color: c.surface2, border: Border(left: BorderSide(color: urgencyColor(c, req.urgency), width: 2), bottom: BorderSide(color: c.border))),
-                child: Row(children: [
-                  BloodPill(req.bloodGroup, role: roleForGroup(req.bloodGroup), height: 22, size: 12),
-                  const SizedBox(width: 10),
-                  Expanded(child: Text('${req.place} · by ${DateFormat('h a').format(req.deadline)}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13))),
-                  Text('${req.committed} of ${req.bagsNeeded}', style: TextStyle(fontSize: 12, color: c.textSecondary)),
-                  Icon(TablerIcons.chevron_right, size: 18, color: c.textMuted),
-                ]),
-              ),
-            ),
-          Expanded(
-            child: ListView(controller: _scroll, padding: const EdgeInsets.all(16), children: [
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(color: c.surface2, borderRadius: BorderRadius.circular(99)),
-                  child: Text('Phone numbers stay hidden unless you share them', style: TextStyle(fontSize: 12, color: c.textMuted)),
-                ),
-              ),
-              for (final m in msgs)
-                Align(
-                  alignment: m.fromUid == me ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Column(crossAxisAlignment: m.fromUid == me ? CrossAxisAlignment.end : CrossAxisAlignment.start, children: [
-                    Container(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * .78),
-                      margin: const EdgeInsets.only(top: 8), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: m.fromUid == me ? c.fillBrand : c.surface1, borderRadius: BorderRadius.circular(20),
-                        border: m.fromUid == me ? null : Border.all(color: c.border),
-                      ),
-                      child: Text(m.text, style: TextStyle(fontSize: 14, color: m.fromUid == me ? c.onFill : c.textPrimary)),
-                    ),
-                    Padding(padding: const EdgeInsets.fromLTRB(4, 2, 4, 0), child: Text(DateFormat('h:mm a').format(m.sentAt), style: TextStyle(fontSize: 11, color: c.textMuted))),
-                  ]),
-                ),
-            ]),
-          ),
-          SizedBox(
-            height: 46,
-            child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.fromLTRB(16, 0, 16, 10), children: [
-              for (final q in ["I'm on my way", 'Running 10 min late', "I've arrived"])
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: ActionChip(label: Text(q), onPressed: () => _send(q), shape: const StadiumBorder(), backgroundColor: c.surface1, side: BorderSide(color: c.borderStrong)),
-                ),
-            ]),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            decoration: BoxDecoration(border: Border(top: BorderSide(color: c.border))),
-            child: Row(children: [
-              CircleIconButton(icon: TablerIcons.map_pin_share, label: 'Share location', filled: false, onPressed: () {}),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _ctrl, onSubmitted: _send, textInputAction: TextInputAction.send,
-                  decoration: InputDecoration(
-                    hintText: 'Write a message', filled: true, fillColor: c.surface1, contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(RRadius.base), borderSide: BorderSide(color: c.borderStronger)),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(RRadius.base), borderSide: BorderSide(color: c.borderStronger)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Material(color: c.fillBrand, shape: const CircleBorder(), child: InkWell(customBorder: const CircleBorder(), onTap: () => _send(_ctrl.text), child: SizedBox(width: 44, height: 44, child: Icon(TablerIcons.send, size: 18, color: c.onFill)))),
-            ]),
-          ),
-        ]),
-      ),
-    );
-  }
-}
-
-/// Chats tab: one thread per request the user committed to.
-class ChatsScreen extends ConsumerWidget {
-  const ChatsScreen({super.key});
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final uid = ref.read(repositoryProvider).uid;
-    final committed = (ref.watch(requestsProvider).value ?? const <BloodRequest>[]).where((r) => r.committedUids.contains(uid));
-    final posted = ref.watch(myRequestsProvider).value ?? const <BloodRequest>[];
-    // Threads for requests you committed to and requests you posted, without duplicates.
-    final mine = {for (final r in [...committed, ...posted]) r.id: r}.values.toList();
-    return SafeArea(
-      child: ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, kNavClearance), children: [
-        Padding(padding: const EdgeInsets.only(left: 4, bottom: 16), child: Text('Chats', style: AppTheme.display(context, size: 26))),
-        if (mine.isEmpty)
-          const SurfaceCard(child: EmptyState(icon: TablerIcons.message_circle, title: 'No chats yet', message: 'Commit to a request, or post one, and its chat shows up here.'))
-        else
-          SurfaceCard(
-            padding: EdgeInsets.zero,
-            child: Column(children: [
-              for (var i = 0; i < mine.length; i++) UrgencyRowChat(mine[i], divider: i > 0),
-            ]),
-          ),
-      ]),
-    );
-  }
-}
-
-class UrgencyRowChat extends StatelessWidget {
-  const UrgencyRowChat(this.r, {super.key, this.divider = false});
-  final BloodRequest r;
-  final bool divider;
-  @override
-  Widget build(BuildContext context) {
-    final c = context.rc;
-    return InkWell(
-      onTap: () => context.push('/chat/${r.id}'),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(border: divider ? Border(top: BorderSide(color: c.border)) : null),
-        child: Row(children: [
-          BloodPill(r.bloodGroup, role: roleForGroup(r.bloodGroup), height: 24, size: 12),
-          const SizedBox(width: 12),
-          Expanded(child: Text('${r.title} · ${r.place}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600))),
-          Icon(TablerIcons.chevron_right, size: 18, color: c.textMuted),
-        ]),
-      ),
     );
   }
 }

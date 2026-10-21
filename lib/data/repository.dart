@@ -62,6 +62,16 @@ abstract class RoktoraRepository {
   Stream<List<ChatMessage>> messages(String requestId);
   Future<void> sendMessage(String requestId, String text);
 
+  /// Shares a map position into the chat (text holds the place name).
+  Future<void> sendLocation(String requestId, double lat, double lng, String label);
+
+  /// Latest message of a thread, for the Chats list.
+  Stream<ChatMessage?> lastMessage(String requestId);
+
+  /// When this user last opened the thread (null if never); unread = newer messages from others.
+  Stream<DateTime?> chatReadAt(String requestId);
+  Future<void> markChatRead(String requestId);
+
   Stream<List<DonationRecord>> donations();
 
   /// Logs a completed donation and bumps the profile counters.
@@ -74,6 +84,7 @@ class FirebaseRepository implements RoktoraRepository {
         _db = db ?? FirebaseFirestore.instance;
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
+  String? _chatName;
 
   @override
   String? get uid => _auth.currentUser?.uid;
@@ -317,13 +328,54 @@ class FirebaseRepository implements RoktoraRepository {
   Stream<List<ChatMessage>> messages(String requestId) => _db
       .collection('requests/$requestId/messages')
       .orderBy('sentAt')
-      .snapshots()
-      .map((s) => s.docs.map((d) => ChatMessage.fromMap(d.data())).toList());
+      .snapshots(includeMetadataChanges: true)
+      .map((s) => [for (final d in s.docs) ChatMessage.fromMap(d.data(), id: d.id, pending: d.metadata.hasPendingWrites)]);
+
+  /// How this user appears in chats: the donor's public "First L." name, cached after the first lookup.
+  Future<String> _senderName() async {
+    if (_chatName != null) return _chatName!;
+    try {
+      final s = await _me.get();
+      if (s.exists) _chatName = DonorProfile.fromMap(uid!, s.data()!).publicName;
+    } catch (_) {}
+    final fallback = _auth.currentUser?.displayName;
+    return _chatName ?? ((fallback != null && fallback.trim().isNotEmpty) ? fallback.trim() : 'Donor');
+  }
+
+  Future<void> _post(String requestId, Map<String, dynamic> body) async {
+    // Written with the server timestamp so ordering doesn't depend on phone clocks (the rules require it).
+    await _db.collection('requests/$requestId/messages').add({
+      'fromUid': uid,
+      'senderName': await _senderName(),
+      'sentAt': FieldValue.serverTimestamp(),
+      ...body,
+    });
+  }
 
   @override
-  Future<void> sendMessage(String requestId, String text) => _db
+  Future<void> sendMessage(String requestId, String text) => _post(requestId, {'text': text});
+
+  @override
+  Future<void> sendLocation(String requestId, double lat, double lng, String label) =>
+      _post(requestId, {'kind': 'location', 'lat': lat, 'lng': lng, 'text': label.isEmpty ? 'Shared location' : label});
+
+  @override
+  Stream<ChatMessage?> lastMessage(String requestId) => _db
       .collection('requests/$requestId/messages')
-      .add(ChatMessage(fromUid: uid!, text: text, sentAt: DateTime.now()).toMap());
+      .orderBy('sentAt', descending: true)
+      .limit(1)
+      .snapshots(includeMetadataChanges: true)
+      .map((s) => s.docs.isEmpty ? null : ChatMessage.fromMap(s.docs.first.data(), id: s.docs.first.id, pending: s.docs.first.metadata.hasPendingWrites));
+
+  @override
+  Stream<DateTime?> chatReadAt(String requestId) => _auth.authStateChanges().asyncExpand((u) {
+        if (u == null) return Stream.value(null);
+        return _db.doc('users/${u.uid}/chatReads/$requestId').snapshots().map((s) => (s.data()?['readAt'] as Timestamp?)?.toDate());
+      });
+
+  @override
+  Future<void> markChatRead(String requestId) =>
+      _db.doc('users/$uid/chatReads/$requestId').set({'readAt': FieldValue.serverTimestamp()});
 }
 
 extension FirebaseDonations on FirebaseRepository {
@@ -349,7 +401,7 @@ class DemoRepository implements RoktoraRepository {
     ];
     _messages = {
       'r1': [
-        ChatMessage(fromUid: 'tanvir', text: "Thank you for committing. He's in surgery prep now.", sentAt: now.subtract(const Duration(minutes: 3))),
+        ChatMessage(fromUid: 'tanvir', senderName: 'Tanvir A.', text: "Thank you for committing. He's in surgery prep now.", sentAt: now.subtract(const Duration(minutes: 3))),
       ],
     };
     _emit();
@@ -570,8 +622,35 @@ class DemoRepository implements RoktoraRepository {
 
   @override
   Future<void> sendMessage(String requestId, String text) async {
-    _messages.putIfAbsent(requestId, () => []).add(ChatMessage(fromUid: _me, text: text, sentAt: DateTime.now()));
+    _messages.putIfAbsent(requestId, () => []).add(ChatMessage(fromUid: _me, text: text, sentAt: DateTime.now(), senderName: _profile?.publicName ?? 'You'));
     _emit();
+  }
+
+  @override
+  Future<void> sendLocation(String requestId, double lat, double lng, String label) async {
+    _messages.putIfAbsent(requestId, () => []).add(ChatMessage(fromUid: _me, text: label, sentAt: DateTime.now(), senderName: _profile?.publicName ?? 'You', lat: lat, lng: lng));
+    _emit();
+  }
+
+  @override
+  Stream<ChatMessage?> lastMessage(String requestId) async* {
+    ChatMessage? last() => (_messages[requestId]?.isNotEmpty ?? false) ? _messages[requestId]!.last : null;
+    yield last();
+    yield* _msg.stream.map((_) => last());
+  }
+
+  final _reads = <String, DateTime>{};
+
+  @override
+  Stream<DateTime?> chatReadAt(String requestId) async* {
+    yield _reads[requestId];
+    yield* _msg.stream.map((_) => _reads[requestId]);
+  }
+
+  @override
+  Future<void> markChatRead(String requestId) async {
+    _reads[requestId] = DateTime.now();
+    _msg.add(null);
   }
 }
 

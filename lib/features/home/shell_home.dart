@@ -12,6 +12,7 @@ import '../../core/widgets/motion.dart';
 import '../../core/widgets/widgets.dart';
 import '../../data/models.dart';
 import '../../data/providers.dart';
+import '../requests/chat_screens.dart' show ChatUnreadBadge;
 
 /// Bottom space tab screens reserve so the floating nav never covers content.
 const double kNavClearance = 96;
@@ -171,7 +172,7 @@ class _AppShellState extends State<AppShell> {
                       _setExpanded(false); // tuck away after choosing a tab
                     },
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Icon(AppShell._tabs[i].$1, size: 22, color: i == shell.currentIndex ? c.textBrand : c.textMuted),
+                      (AppShell._tabs[i].$2 == 'Chats' ? ChatUnreadBadge(child: Icon(AppShell._tabs[i].$1, size: 22, color: i == shell.currentIndex ? c.textBrand : c.textMuted)) : Icon(AppShell._tabs[i].$1, size: 22, color: i == shell.currentIndex ? c.textBrand : c.textMuted)),
                       const SizedBox(height: 2),
                       Text(
                         AppShell._tabs[i].$2,

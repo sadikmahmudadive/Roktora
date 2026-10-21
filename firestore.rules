@@ -60,6 +60,11 @@ service cloud.firestore {
         allow delete: if isOwner(uid);
       }
 
+      // When this user last opened each chat (drives unread badges). Private to the owner.
+      match /chatReads/{requestId} {
+        allow read, write: if isOwner(uid);
+      }
+
       // Messages hospitals send to a donor.
       match /inbox/{id} {
         allow read: if isOwner(uid);
@@ -102,9 +107,15 @@ service cloud.firestore {
     }
 
     match /requests/{requestId} {
+      // Who may use the chat: the requester, donors who committed, and the posting hospital's staff.
       function isCommittedOrOwner() {
         let r = get(/databases/$(database)/documents/requests/$(requestId)).data;
-        return request.auth.uid in r.get('committedUids', []) || r.get('createdBy', '') == request.auth.uid;
+        return request.auth.uid in r.get('committedUids', [])
+          || r.get('createdBy', '') == request.auth.uid
+          || isStaffOf(r.get('hospitalId', ''));
+      }
+      function isOpenRequest() {
+        return get(/databases/$(database)/documents/requests/$(requestId)).data.get('status', 'open') == 'open';
       }
 
       allow read: if signedIn();
@@ -146,10 +157,18 @@ service cloud.firestore {
       // Chat is limited to the requester and donors who committed.
       match /messages/{messageId} {
         allow read: if signedIn() && isCommittedOrOwner();
-        allow create: if signedIn() && isCommittedOrOwner()
+        // Messages are text or a shared location, stamped by the server, and only while the request is open.
+        allow create: if signedIn() && isCommittedOrOwner() && isOpenRequest()
+          && request.resource.data.keys().hasOnly(['fromUid', 'text', 'sentAt', 'senderName', 'kind', 'lat', 'lng'])
           && request.resource.data.fromUid == request.auth.uid
+          && request.resource.data.sentAt == request.time
           && request.resource.data.text is string
-          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
+          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+          && request.resource.data.get('senderName', '') is string
+          && request.resource.data.get('senderName', '').size() <= 60
+          && request.resource.data.get('kind', 'text') in ['text', 'location']
+          && (request.resource.data.get('kind', 'text') == 'text'
+              || (request.resource.data.get('lat', null) is number && request.resource.data.get('lng', null) is number));
         allow update, delete: if false;
       }
     }

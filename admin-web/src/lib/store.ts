@@ -338,3 +338,57 @@ export async function saveHospital(h: Pick<Hospital, "id" | "name" | "address" |
   const place = typeof h.lat === "number" && typeof h.lng === "number" ? { lat: h.lat, lng: h.lng } : {};
   await setDoc(doc(requireDb(), "hospitals", h.id), { name: h.name, address: h.address, phone: h.phone, about: h.about, ...place }, { merge: true });
 }
+
+// ------------------------------------------------------------------ request chat
+
+export interface ChatMsg {
+  id: string;
+  fromUid: string;
+  senderName: string;
+  text: string;
+  sentAt: Date | null;
+  /** Set for a shared location. */
+  lat: number | null;
+  lng: number | null;
+  pending: boolean;
+}
+
+export function toChatMsg(id: string, d: DocumentData, pending: boolean): ChatMsg {
+  const loc = d.kind === "location";
+  return {
+    id,
+    fromUid: str(d.fromUid),
+    senderName: str(d.senderName),
+    text: str(d.text),
+    sentAt: toDate(d.sentAt),
+    lat: loc && typeof d.lat === "number" ? d.lat : null,
+    lng: loc && typeof d.lng === "number" ? d.lng : null,
+    pending,
+  };
+}
+
+/** Live chat for one request (the requester, committed donors and the hospital's staff can read it). */
+export function useMessages(requestId: string | undefined) {
+  return useLive<ChatMsg[]>(
+    [],
+    requestId && db
+      ? (emit, fail) =>
+          onSnapshot(
+            query(collection(db!, "requests", requestId, "messages"), orderBy("sentAt")),
+            { includeMetadataChanges: true },
+            (s) => emit(s.docs.map((d) => toChatMsg(d.id, d.data({ serverTimestamps: "estimate" }), d.metadata.hasPendingWrites))),
+            fail,
+          )
+      : null,
+    [requestId],
+  );
+}
+
+export async function sendChatMessage(requestId: string, fromUid: string, senderName: string, text: string) {
+  await addDoc(collection(requireDb(), "requests", requestId, "messages"), {
+    fromUid,
+    senderName: senderName.slice(0, 60),
+    text: text.slice(0, 1000),
+    sentAt: serverTimestamp(),
+  });
+}

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { BloodPill } from "@/components/badges";
 import { NewRequestDialog } from "@/components/new-request-dialog";
+import { RequestChat } from "@/components/request-chat";
 import { useStaff } from "@/components/shell";
 import { Avatar, Banner, Button, Dialog, Empty, IconButton, Page, Panel, Pill, Progress, Segmented, Spinner, cn } from "@/components/ui";
 import { useMedia } from "@/lib/use-media";
@@ -154,6 +155,8 @@ function RequestDetail({ request: r, onClose }: { request: BloodRequest; onClose
           })}
         </ul>
       )}
+
+      <RequestChat requestId={r.id} open={r.status === "open"} uid={staff.uid} name={staff.name} />
 
       <div className="mt-5 flex flex-wrap gap-2">
         {r.status === "open" ? (

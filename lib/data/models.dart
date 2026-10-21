@@ -184,15 +184,38 @@ class BloodRequest {
 }
 
 class ChatMessage {
-  const ChatMessage({required this.fromUid, required this.text, required this.sentAt});
-  final String fromUid, text;
+  const ChatMessage({
+    this.id = '',
+    required this.fromUid,
+    required this.text,
+    required this.sentAt,
+    this.senderName = '',
+    this.lat,
+    this.lng,
+    this.pending = false,
+  });
+  final String id, fromUid, text, senderName;
   final DateTime sentAt;
 
-  Map<String, dynamic> toMap() => {'fromUid': fromUid, 'text': text, 'sentAt': Timestamp.fromDate(sentAt)};
-  factory ChatMessage.fromMap(Map<String, dynamic> m) => ChatMessage(
+  /// Set for a shared location (text then holds the place name).
+  final double? lat, lng;
+  bool get isLocation => lat != null && lng != null;
+
+  /// True until the server has acknowledged the message (shown with a clock instead of a time).
+  final bool pending;
+
+  /// What a thread row shows for this message.
+  String get preview => isLocation ? '📍 Shared a location' : text;
+
+  factory ChatMessage.fromMap(Map<String, dynamic> m, {String id = '', bool pending = false}) => ChatMessage(
+        id: id,
         fromUid: (m['fromUid'] ?? '') as String,
         text: (m['text'] ?? '') as String,
+        senderName: (m['senderName'] ?? '') as String,
         sentAt: ((m['sentAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+        lat: m['kind'] == 'location' ? (m['lat'] as num?)?.toDouble() : null,
+        lng: m['kind'] == 'location' ? (m['lng'] as num?)?.toDouble() : null,
+        pending: pending,
       );
 }
 

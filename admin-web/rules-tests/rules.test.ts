@@ -259,11 +259,35 @@ describe("blood requests", () => {
 
 describe("chat and reports", () => {
   it("only committed donors and the requester can read or write a request's chat", async () => {
-    const msg = { fromUid: "donor1", text: "On my way", sentAt: Timestamp.now() };
+    const msg = { fromUid: "donor1", text: "On my way", senderName: "Farhan H.", sentAt: serverTimestamp() };
     await assertSucceeds(addDoc(collection(as("donor1"), "requests/hospReq/messages"), msg)); // committed
     await assertSucceeds(addDoc(collection(as("admin1"), "requests/hospReq/messages"), { ...msg, fromUid: "admin1" })); // requester
+    await assertSucceeds(addDoc(collection(as("staff1"), "requests/hospReq/messages"), { ...msg, fromUid: "staff1" })); // hospital staff
+    await assertFails(addDoc(collection(as("other1"), "requests/hospReq/messages"), { ...msg, fromUid: "other1" })); // another hospital
     await assertFails(addDoc(collection(as("donor2"), "requests/hospReq/messages"), { ...msg, fromUid: "donor2" })); // outsider
     await assertFails(addDoc(collection(as("donor1"), "requests/hospReq/messages"), { ...msg, fromUid: "donor2" })); // spoofed sender
+  });
+
+  it("messages must be server-stamped, well formed, and only while the request is open", async () => {
+    const db = as("donor1");
+    const ok = { fromUid: "donor1", text: "hi", sentAt: serverTimestamp() };
+    await assertFails(addDoc(collection(db, "requests/hospReq/messages"), { ...ok, sentAt: Timestamp.fromMillis(1000) })); // backdated
+    await assertFails(addDoc(collection(db, "requests/hospReq/messages"), { ...ok, text: "" }));
+    await assertFails(addDoc(collection(db, "requests/hospReq/messages"), { ...ok, text: "x".repeat(1001) }));
+    await assertFails(addDoc(collection(db, "requests/hospReq/messages"), { ...ok, extra: "nope" }));
+    await assertFails(addDoc(collection(db, "requests/hospReq/messages"), { ...ok, kind: "location" })); // location needs coordinates
+    await assertSucceeds(addDoc(collection(db, "requests/hospReq/messages"), { ...ok, kind: "location", lat: 23.75, lng: 90.37, text: "Mirpur 10" }));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await updateDoc(doc(ctx.firestore(), "requests/hospReq"), { status: "fulfilled" });
+    });
+    await assertFails(addDoc(collection(db, "requests/hospReq/messages"), ok)); // closed
+    await assertSucceeds(getDocs(collection(db, "requests/hospReq/messages"))); // history stays readable
+  });
+
+  it("a user keeps their own chat read markers private", async () => {
+    await assertSucceeds(setDoc(doc(as("donor1"), "users/donor1/chatReads/hospReq"), { readAt: serverTimestamp() }));
+    await assertFails(getDoc(doc(as("donor2"), "users/donor1/chatReads/hospReq")));
+    await assertFails(setDoc(doc(as("donor2"), "users/donor1/chatReads/hospReq"), { readAt: serverTimestamp() }));
   });
 
   it("anyone signed in can file a report, but nobody can read them back", async () => {

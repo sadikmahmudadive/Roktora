@@ -15,6 +15,10 @@ final requestProvider =
     StreamProvider.family<BloodRequest?, String>((ref, id) => ref.watch(repositoryProvider).request(id));
 final messagesProvider =
     StreamProvider.family<List<ChatMessage>, String>((ref, id) => ref.watch(repositoryProvider).messages(id));
+final lastMessageProvider =
+    StreamProvider.family<ChatMessage?, String>((ref, id) => ref.watch(repositoryProvider).lastMessage(id));
+final chatReadProvider =
+    StreamProvider.family<DateTime?, String>((ref, id) => ref.watch(repositoryProvider).chatReadAt(id));
 final myRequestsProvider = StreamProvider<List<BloodRequest>>((ref) => ref.watch(repositoryProvider).myRequests());
 final inboxProvider = StreamProvider<List<InboxMessage>>((ref) => ref.watch(repositoryProvider).inbox());
 final donationsProvider = StreamProvider<List<DonationRecord>>((ref) => ref.watch(repositoryProvider).donations());
